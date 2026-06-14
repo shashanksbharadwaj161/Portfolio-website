@@ -155,5 +155,11 @@
     "contact_whatsapp": "WhatsApp",
     "contact_linkedin": "LinkedIn",
     "contact_github": "GitHub"
+  },
+  "notFound": {
+    "subtitle": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "back": "Go Back",
+    "home": "Back to Home"
   }
 }

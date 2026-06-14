@@ -51,13 +51,23 @@ src/
 └── middleware.ts            # locale routing
 ```
 
+## Pages
+
+- **Landing** — animated hero, Three.js particle field, floating orb nav, language toggle
+- **Research** — a 5-chapter cinematic story (hand SVG → pinned glove deep-dive → auto-playing Tower of Hanoi demo → 3D AR-glasses reveal → full system diagram)
+- **Projects** — filterable grid of 10 projects with detail modals
+- **Achievements** — Rotary Yoneyama scholar spotlight, journey timeline, hackathons, certifications, contact
+
+Every page is fully bilingual (English / 日本語) with matched translation keys.
+
+## SEO & deployment
+
+- Per-route, locale-aware metadata (Open Graph, Twitter, robots, hreflang `alternates`)
+- Generated `sitemap.xml`, `robots.txt`, and a build-time Open Graph image
+- Set `NEXT_PUBLIC_SITE_URL` (see `.env.example`) to your production origin
+- Deploy on Vercel: import the repo, set `NEXT_PUBLIC_SITE_URL`, and deploy (zero config)
+
 ## Assets
 
 Project screenshots go in `public/projects/` and research visuals in
 `public/research/` (see the READMEs in those folders for expected filenames).
-
-## Status
-
-**Sprint 1 — Foundation complete:** project setup, design system, bilingual
-routing, translations, content constants, and reusable component scaffolding.
-Rich animations and 3D scenes are layered on in subsequent sprints.

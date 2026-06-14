@@ -155,5 +155,11 @@
     "contact_whatsapp": "WhatsApp",
     "contact_linkedin": "LinkedIn",
     "contact_github": "GitHub"
+  },
+  "notFound": {
+    "subtitle": "ページが見つかりません",
+    "description": "お探しのページは存在しないか、移動されました。",
+    "back": "戻る",
+    "home": "ホームに戻る"
   }
 }
