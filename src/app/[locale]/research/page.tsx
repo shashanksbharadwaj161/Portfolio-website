@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronDown, Github } from 'lucide-react';
+import { ChevronDown, Gauge, Github, Hand, Zap } from 'lucide-react';
 import CircuitBackground from '@/components/research/CircuitBackground';
 import HandDiagram from '@/components/research/HandDiagram';
 import GloveStage from '@/components/research/GloveStage';
 import HanoiDemo from '@/components/research/HanoiDemo';
-import GlassesDiagram from '@/components/research/GlassesDiagram';
+import ArGlassesReveal from '@/components/research/ArGlassesReveal';
 import SystemDiagram from '@/components/research/SystemDiagram';
 import { cn } from '@/lib/utils';
 import '@/styles/research.css';
@@ -275,18 +275,32 @@ export default function ResearchPage() {
 
       {/* ---------- Chapter 4 ---------- */}
       <div id="chapter-4">
-        <section className="chapter">
-          <div className="chapter-grid">
-            <div className="chapter-text">
-              <p className="chapter-label">{t('chapter4_label')}</p>
-              <h2 className="chapter-headline">{t('chapter4_title')}</h2>
-              <p className="chapter-body">{t('chapter4_body')}</p>
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter4_label')}</p>
+          <h2 className="chapter-headline">{t('chapter4_title')}</h2>
+          <p className="chapter-body">{t('chapter4_body')}</p>
+        </section>
+
+        <ArGlassesReveal />
+
+        <div className="ar-metrics-wrap">
+          <h3 className="ar-metrics-title">{t('chapter4_metrics_title')}</h3>
+          <p className="ar-metrics-subtitle">{t('chapter4_metrics_subtitle')}</p>
+          <div className="ar-metrics">
+            <div className="ar-metric-card">
+              <Gauge className="ar-metric-icon" size={26} strokeWidth={1.75} />
+              <span className="ar-metric-text">{t('chapter4_metric1')}</span>
             </div>
-            <div className="chapter-visual">
-              <GlassesDiagram />
+            <div className="ar-metric-card">
+              <Zap className="ar-metric-icon" size={26} strokeWidth={1.75} />
+              <span className="ar-metric-text">{t('chapter4_metric2')}</span>
+            </div>
+            <div className="ar-metric-card">
+              <Hand className="ar-metric-icon" size={26} strokeWidth={1.75} />
+              <span className="ar-metric-text">{t('chapter4_metric3')}</span>
             </div>
           </div>
-        </section>
+        </div>
       </div>
 
       {/* ---------- Chapter 5 ---------- */}
