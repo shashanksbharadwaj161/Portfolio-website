@@ -1,7 +1,10 @@
 'use client';
+import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -21,7 +24,8 @@ const HeroParticles = dynamic(() => import('@/components/three/HeroParticles'), 
 
 /**
  * Renders the name with the last three letters in a cyan gradient.
- * For space-separated names (EN) the surname drops to a second line.
+ * For space-separated names (EN) the surname drops to a second line so the
+ * two lines can be animated independently.
  */
 function HeroName({ name }: { name: string }) {
   const words = name.trim().split(/\s+/);
@@ -33,10 +37,11 @@ function HeroName({ name }: { name: string }) {
     const lastAccent = last.slice(-3);
     return (
       <>
-        {first}
-        <br />
-        {lastMain}
-        <span className="text-gradient-cyan">{lastAccent}</span>
+        <span className="hero-name-line1">{first}</span>
+        <span className="hero-name-line2">
+          {lastMain}
+          <span className="text-gradient-cyan">{lastAccent}</span>
+        </span>
       </>
     );
   }
@@ -44,10 +49,10 @@ function HeroName({ name }: { name: string }) {
   const main = name.slice(0, -3);
   const accent = name.slice(-3);
   return (
-    <>
+    <span className="hero-name-line1">
       {main}
       <span className="text-gradient-cyan">{accent}</span>
-    </>
+    </span>
   );
 }
 
@@ -55,6 +60,100 @@ export default function HomePage() {
   const t = useTranslations('hero');
   const tn = useTranslations('nav');
   const locale = useLocale();
+  const rootRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Reduced motion: the CSS @media override reveals everything statically.
+    if (prefersReduced) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ delay: 0.2, defaults: { ease: 'power3.out' } });
+
+      tl.fromTo(
+        document.body,
+        { backgroundColor: '#000000' },
+        { backgroundColor: '#060914', duration: 0.8, ease: 'power3.inOut' }
+      )
+        .fromTo(
+          '.hero-line',
+          { scaleX: 0, transformOrigin: 'left' },
+          { scaleX: 1, duration: 0.8, ease: 'power3.inOut' }
+        )
+        .fromTo('.hero-label', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.3')
+        .fromTo(
+          '.hero-name-line1',
+          { opacity: 0, y: 60, skewX: -5 },
+          { opacity: 1, y: 0, skewX: 0, duration: 0.7, ease: 'power4.out' },
+          '-=0.2'
+        )
+        .fromTo(
+          '.hero-name-line2',
+          { opacity: 0, y: 60, skewX: -5 },
+          { opacity: 1, y: 0, skewX: 0, duration: 0.7, ease: 'power4.out' },
+          '-=0.5'
+        )
+        .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.3')
+        .fromTo(
+          '.hero-buttons > *',
+          { opacity: 0, scale: 0.9 },
+          { opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(1.5)' },
+          '-=0.2'
+        )
+        .fromTo(
+          '.floating-stat',
+          { opacity: 0, scale: 0.8 },
+          { opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(1.3)' },
+          '-=0.3'
+        )
+        .fromTo('.scroll-indicator', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
+        .fromTo('.hero-canvas canvas', { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.5');
+
+      // Continuous chevron pulse
+      gsap.to('.scroll-chevron', {
+        y: 8,
+        duration: 0.8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      // Continuous floating stats (starts after the intro, staggered phases)
+      gsap.to('.floating-stat', {
+        y: -8,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: 2,
+        stagger: 1,
+      });
+
+      // Preview cards reveal on scroll
+      gsap.fromTo(
+        '.preview-card',
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.preview-row',
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const previews = [
     {
@@ -81,7 +180,7 @@ export default function HomePage() {
   ] as const;
 
   return (
-    <main>
+    <main ref={rootRef}>
       {/* ---------- Section A: Hero ---------- */}
       <section className="hero-section">
         {/* Three.js particle field (over a static depth glow) + subtle grid */}
@@ -89,6 +188,7 @@ export default function HomePage() {
           <HeroParticles />
         </div>
         <div className="hero-grid" aria-hidden="true" />
+        <div className="hero-line" aria-hidden="true" />
 
         <div className="hero-content">
           <div className="hero-label">
@@ -136,6 +236,9 @@ export default function HomePage() {
 
         <div className="university-badge">{t('university')}</div>
       </section>
+
+      {/* Decorative divider between hero and preview */}
+      <div className="hero-divider" aria-hidden="true" />
 
       {/* ---------- Section B: Quick preview row ---------- */}
       <section className="preview-row">
