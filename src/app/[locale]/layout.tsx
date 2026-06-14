@@ -5,10 +5,8 @@ import { notFound } from 'next/navigation';
 import { locales, type Locale } from '@/i18n';
 import '../globals.css';
 import '@/styles/glass.css';
-import SmoothScroll from '@/components/layout/SmoothScroll';
 import CustomCursor from '@/components/ui/CustomCursor';
-import NavigationOrbs from '@/components/layout/NavigationOrbs';
-import LanguageToggle from '@/components/layout/LanguageToggle';
+import PageTransition from '@/components/layout/PageTransition';
 
 export const metadata: Metadata = {
   title: 'Shashank S Bharadwaj — Researcher & Full-Stack Developer',
@@ -40,9 +38,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <CustomCursor />
-          <NavigationOrbs />
-          <LanguageToggle />
-          <SmoothScroll>{children}</SmoothScroll>
+          <PageTransition>{children}</PageTransition>
         </NextIntlClientProvider>
       </body>
     </html>
