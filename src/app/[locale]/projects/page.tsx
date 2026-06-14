@@ -1,73 +1,42 @@
 'use client';
-import { useLocale, useTranslations } from 'next-intl';
-import GlassCard from '@/components/ui/GlassCard';
+import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { gsap } from 'gsap';
+import ProjectsGrid from '@/components/projects/ProjectsGrid';
 import { PROJECTS } from '@/lib/constants';
+import '@/styles/projects.css';
 
 export default function ProjectsPage() {
   const t = useTranslations('projects');
-  const locale = useLocale();
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+    const ctx = gsap.context(() => {
+      gsap
+        .timeline({ defaults: { ease: 'power3.out' } })
+        .fromTo('.projects-hero-label', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.6 })
+        .fromTo(
+          '.projects-hero-title',
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.8 },
+          '-=0.3'
+        )
+        .fromTo('.projects-hero-subtitle', { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.4');
+    }, heroRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <main className="section px-6 pt-28">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="text-display text-gradient-cyan text-center text-5xl font-bold md:text-6xl">
-          {t('page_title')}
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-[var(--text-secondary)]">
-          {t('subtitle')}
-        </p>
+    <main className="projects-page">
+      <section ref={heroRef} className="projects-hero">
+        <p className="projects-hero-label">{t('hero_label')}</p>
+        <h1 className="projects-hero-title text-gradient-cyan">{t('hero_title')}</h1>
+        <p className="projects-hero-subtitle">{t('hero_subtitle')}</p>
+      </section>
 
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {PROJECTS.map((project) => (
-            <GlassCard key={project.id} className="flex flex-col">
-              <span
-                className="text-mono text-xs uppercase tracking-widest"
-                style={{ color: project.accent }}
-              >
-                {t(`categories.${project.category}`)}
-              </span>
-              <h2 className="text-display mt-2 text-xl font-semibold text-[var(--text-primary)]">
-                {locale === 'ja' ? project.titleJa : project.title}
-              </h2>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
-                {locale === 'ja' ? project.descriptionJa : project.description}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {project.tech.map((tech) => (
-                  <span
-                    key={tech}
-                    className="text-mono rounded-lg border border-[var(--glass-border)] px-2 py-1 text-[10px] text-[var(--text-secondary)]"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-5 flex gap-4 text-sm">
-                {project.url && (
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--cyan)] hover:underline"
-                  >
-                    {t('view_live')}
-                  </a>
-                )}
-                {project.github && (
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--gold)] hover:underline"
-                  >
-                    {t('view_github')}
-                  </a>
-                )}
-              </div>
-            </GlassCard>
-          ))}
-        </div>
-      </div>
+      <ProjectsGrid projects={PROJECTS} />
     </main>
   );
 }

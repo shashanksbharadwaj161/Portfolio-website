@@ -2,6 +2,7 @@ export type ProjectCategory = 'ecommerce' | 'realestate' | 'ai';
 
 export interface Project {
   id: number;
+  year: string;
   title: string;
   titleJa: string;
   category: ProjectCategory;
@@ -19,6 +20,7 @@ export interface Project {
 export const PROJECTS: Project[] = [
   {
     id: 1,
+    year: '2024',
     title: 'Gau Bhoomi Naturals',
     titleJa: 'ガウ・ブーミ・ナチュラルズ',
     category: 'ecommerce',
@@ -35,6 +37,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 2,
+    year: '2024',
     title: 'Ayurvedic Wellness Store',
     titleJa: 'アーユルヴェーダ・ウェルネスストア',
     category: 'ecommerce',
@@ -51,6 +54,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 3,
+    year: '2024',
     title: 'HomeNexus',
     titleJa: 'ホームネクサス',
     category: 'realestate',
@@ -67,6 +71,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 4,
+    year: '2025',
     title: 'SaalAnKruta Jewellery',
     titleJa: 'サーランクルタ・ジュエリー',
     category: 'ecommerce',
@@ -83,6 +88,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 5,
+    year: '2024',
     title: 'RERA Mysore',
     titleJa: 'RERAマイソール',
     category: 'realestate',
@@ -99,6 +105,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 6,
+    year: '2025',
     title: 'ChocoRush',
     titleJa: 'チョコラッシュ',
     category: 'ecommerce',
@@ -115,6 +122,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 7,
+    year: '2024',
     title: 'MAPA Properties',
     titleJa: 'MAPAプロパティーズ',
     category: 'realestate',
@@ -131,6 +139,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 8,
+    year: '2025',
     title: 'AI Budget Tracker',
     titleJa: 'AIバジェットトラッカー',
     category: 'ai',
@@ -147,6 +156,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 9,
+    year: '2025',
     title: 'Rent Agreement Generator',
     titleJa: '賃貸契約書ジェネレーター',
     category: 'ai',
@@ -163,6 +173,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 10,
+    year: '2023',
     title: 'Visual Search App',
     titleJa: 'ビジュアル検索アプリ',
     category: 'ai',

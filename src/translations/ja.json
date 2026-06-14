@@ -117,7 +117,20 @@
       "ecommerce": "Eコマース",
       "realestate": "不動産",
       "ai": "AI・ユーティリティ"
-    }
+    },
+    "hero_label": "ポートフォリオ",
+    "hero_title": "10 プロジェクト。3 年間。1 つの目標：より良いものを構築する。",
+    "hero_subtitle": "eコマースプラットフォームから AI 駆動ツールまで、各プロジェクトは私に何か新しいことを教えてくれました。",
+    "filter_all": "すべてのプロジェクト",
+    "filter_ecommerce": "eコマース",
+    "filter_real_estate": "不動産",
+    "filter_ai": "AI とツール",
+    "view_site": "ライブサイトにアクセス",
+    "view_code": "コードを表示",
+    "view_details": "詳細を見る",
+    "modal_close": "閉じる",
+    "tech_stack": "テックスタック",
+    "year": "年"
   },
   "achievements": {
     "page_title": "実績",

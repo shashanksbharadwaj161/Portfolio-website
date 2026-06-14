@@ -117,7 +117,20 @@
       "ecommerce": "E-Commerce",
       "realestate": "Real Estate",
       "ai": "AI & Utilities"
-    }
+    },
+    "hero_label": "PORTFOLIO",
+    "hero_title": "10 Projects. 3 Years. One Goal: Build Better.",
+    "hero_subtitle": "From ecommerce platforms to AI-powered tools, each project taught me something new.",
+    "filter_all": "All Projects",
+    "filter_ecommerce": "Ecommerce",
+    "filter_real_estate": "Real Estate",
+    "filter_ai": "AI & Tools",
+    "view_site": "Visit Live Site",
+    "view_code": "View Code",
+    "view_details": "View Details",
+    "modal_close": "Close",
+    "tech_stack": "Tech Stack",
+    "year": "Year"
   },
   "achievements": {
     "page_title": "Achievements",
