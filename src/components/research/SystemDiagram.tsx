@@ -1,33 +1,120 @@
 'use client';
+import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react';
 
-/** Chapter 5 — the complete loop: glove → processing → AR glasses. */
+/**
+ * Chapter 5 — full system architecture. HTML blocks (so translated labels
+ * wrap cleanly) wired with pulsing flow arrows; the processor sits at the
+ * centre with a breathing glow, and golden feedback arrows close the loop.
+ */
 export default function SystemDiagram() {
+  const t = useTranslations('research');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return; // CSS shows blocks + base-opacity arrows statically
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.system-block',
+        { opacity: 0, scale: 0.85 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: 'back.out(1.5)',
+          scrollTrigger: { trigger: ref.current, start: 'top 75%' },
+        }
+      );
+      gsap.to('.flow-arrow', {
+        opacity: 1,
+        duration: 1.2,
+        repeat: -1,
+        yoyo: true,
+        stagger: 0.25,
+        ease: 'sine.inOut',
+      });
+      gsap.to('.processor-glow', {
+        opacity: 0.8,
+        scale: 1.12,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+      gsap.to('.feedback-arrow', {
+        opacity: 1,
+        y: -4,
+        duration: 1.4,
+        repeat: -1,
+        yoyo: true,
+        stagger: 0.2,
+        ease: 'sine.inOut',
+      });
+    }, ref);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <svg className="story-svg system-svg" viewBox="0 0 300 200" aria-hidden="true">
-      {/* Glove node */}
-      <g>
-        <circle cx="50" cy="100" r="34" fill="rgba(0,217,255,0.10)" stroke="#00d9ff" strokeWidth="2" />
-        <path d="M40 96 v-18 M50 94 v-22 M60 96 v-18 M40 96 q-6 4 -6 14 v8 h32 v-8 q0 -10 -6 -14" stroke="#00d9ff" strokeWidth="2" fill="none" />
-      </g>
+    <div className="system-diagram-container" ref={ref}>
+      <div className="system-flow">
+        <div
+          className="system-block"
+          style={{ '--block-accent': '#00d9ff', '--block-dim': 'rgba(0,217,255,0.1)' } as React.CSSProperties}
+        >
+          <span className="system-label">{t('chapter5_system_input')}</span>
+          <span className="system-sublabel">Finger Movements</span>
+          <span className="system-sublabel">Pressure Patterns</span>
+        </div>
 
-      {/* Processing node */}
-      <g>
-        <rect x="120" y="74" width="60" height="52" rx="10" fill="rgba(124,58,237,0.12)" stroke="#7c3aed" strokeWidth="2" />
-        <circle cx="150" cy="100" r="10" fill="none" stroke="#7c3aed" strokeWidth="2" />
-        <circle cx="150" cy="100" r="3" fill="#7c3aed" />
-      </g>
+        <ArrowRight className="flow-arrow" size={28} />
 
-      {/* Glasses node */}
-      <g>
-        <circle cx="250" cy="100" r="34" fill="rgba(212,165,116,0.10)" stroke="#d4a574" strokeWidth="2" />
-        <rect x="232" y="92" width="14" height="12" rx="4" fill="none" stroke="#d4a574" strokeWidth="2" />
-        <rect x="254" y="92" width="14" height="12" rx="4" fill="none" stroke="#d4a574" strokeWidth="2" />
-        <line x1="246" y1="96" x2="254" y2="96" stroke="#d4a574" strokeWidth="2" />
-      </g>
+        <div
+          className="system-block"
+          style={{ '--block-accent': '#d4a574', '--block-dim': 'rgba(212,165,116,0.1)' } as React.CSSProperties}
+        >
+          <span className="system-label">{t('chapter5_system_glove')}</span>
+          <span className="system-sublabel">8 Pressure Points</span>
+          <span className="system-sublabel">9-DOF IMU</span>
+        </div>
 
-      {/* Data flow lines */}
-      <line className="flow-line" x1="84" y1="100" x2="120" y2="100" stroke="#00d9ff" strokeWidth="2" strokeDasharray="4 4" />
-      <line className="flow-line" x1="180" y1="100" x2="216" y2="100" stroke="#d4a574" strokeWidth="2" strokeDasharray="4 4" />
-    </svg>
+        <ArrowRight className="flow-arrow" size={28} />
+
+        <div
+          className="system-block"
+          style={{ '--block-accent': '#7c3aed', '--block-dim': 'rgba(124,58,237,0.1)' } as React.CSSProperties}
+        >
+          <span className="system-label">{t('chapter5_system_glasses')}</span>
+          <span className="system-sublabel">Real-time Guidance</span>
+          <span className="system-sublabel">30 FPS Display</span>
+        </div>
+      </div>
+
+      <ArrowDown className="flow-arrow system-down" size={28} />
+
+      <div className="system-processor-wrap">
+        <span className="processor-glow" aria-hidden="true" />
+        <div
+          className="system-block system-block--processor"
+          style={{ '--block-accent': '#00d9ff', '--block-dim': 'rgba(0,217,255,0.18)' } as React.CSSProperties}
+        >
+          <span className="system-label">{t('chapter5_system_processor')}</span>
+          <span className="system-sublabel">Real-time Analysis</span>
+        </div>
+      </div>
+
+      <div className="system-feedback">
+        <ArrowUp className="feedback-arrow" size={18} />
+        <span className="feedback-label">{t('chapter5_integration_point')}</span>
+        <ArrowUp className="feedback-arrow" size={18} />
+      </div>
+    </div>
   );
 }

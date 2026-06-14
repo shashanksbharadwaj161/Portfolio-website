@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronDown, Gauge, Github, Hand, Zap } from 'lucide-react';
+import { ChevronDown, Gauge, Github, Hand, Radio, RefreshCw, Target, Zap } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import CircuitBackground from '@/components/research/CircuitBackground';
 import HandDiagram from '@/components/research/HandDiagram';
 import GloveStage from '@/components/research/GloveStage';
@@ -15,12 +16,29 @@ import '@/styles/research.css';
 
 const RESEARCH_REPO = 'https://github.com/shashanksbharadwaj161/rayban-dataglove-hanoi';
 
-const METRICS = [
-  { value: 95, prefix: '', suffix: '%', labelKey: 'metrics_accuracy' },
-  { value: 50, prefix: '~', suffix: 'ms', labelKey: 'metrics_latency' },
-  { value: 8, prefix: '', suffix: '', labelKey: 'metrics_sensors' },
-  { value: 9, prefix: '', suffix: '', labelKey: 'metrics_axes' },
-] as const;
+interface SysMetric {
+  Icon: LucideIcon;
+  labelKey: string;
+  display: string;
+  value?: number;
+  prefix?: string;
+  suffix?: string;
+  comma?: boolean;
+}
+
+const SYS_METRICS: SysMetric[] = [
+  { Icon: Target, labelKey: 'chapter5_metric_accuracy', display: '95%', value: 95, suffix: '%' },
+  { Icon: Zap, labelKey: 'chapter5_metric_latency', display: '~50ms', value: 50, prefix: '~', suffix: 'ms' },
+  { Icon: Radio, labelKey: 'chapter5_metric_sensors', display: '8 + 9-DOF' },
+  {
+    Icon: RefreshCw,
+    labelKey: 'chapter5_metric_readings',
+    display: '1,200+/s',
+    value: 1200,
+    suffix: '+/s',
+    comma: true,
+  },
+];
 
 export default function ResearchPage() {
   const t = useTranslations('research');
@@ -153,31 +171,33 @@ export default function ResearchPage() {
         .fromTo('.phase-wm-4', { opacity: 0 }, { opacity: 0.05, duration: 0.5 }, 3)
         .fromTo('.g-imu', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 3);
 
-      // Metrics count-up
-      gsap.utils.toArray<HTMLElement>('.metric-value').forEach((el) => {
+      // Chapter 5 metric count-ups
+      gsap.utils.toArray<HTMLElement>('.sys-metric-value[data-value]').forEach((el) => {
         const target = Number(el.dataset.value || '0');
         const prefix = el.dataset.prefix || '';
         const suffix = el.dataset.suffix || '';
+        const comma = el.dataset.comma === '1';
         const obj = { v: 0 };
+        el.textContent = `${prefix}0${suffix}`;
         gsap.to(obj, {
           v: target,
           duration: 1.8,
           ease: 'power2.out',
           scrollTrigger: { trigger: el, start: 'top 88%' },
           onUpdate: () => {
-            el.textContent = `${prefix}${Math.round(obj.v)}${suffix}`;
+            const n = Math.round(obj.v);
+            el.textContent = `${prefix}${comma ? n.toLocaleString('en-US') : n}${suffix}`;
           },
         });
       });
 
-      // CTA entrance
-      gsap.from('.research-cta > *', {
+      // Closing CTA entrance
+      gsap.from('.research-cta-section', {
         opacity: 0,
         y: 30,
-        duration: 0.6,
-        stagger: 0.12,
+        duration: 0.7,
         ease: 'power3.out',
-        scrollTrigger: { trigger: '.research-cta', start: 'top 80%' },
+        scrollTrigger: { trigger: '.research-cta-section', start: 'top 85%' },
       });
 
       ScrollTrigger.refresh();
@@ -303,56 +323,53 @@ export default function ResearchPage() {
         </div>
       </div>
 
-      {/* ---------- Chapter 5 ---------- */}
+      {/* ---------- Chapter 5: full system + finale ---------- */}
       <div id="chapter-5">
-        <section className="chapter chapter--reverse">
-          <div className="chapter-grid">
-            <div className="chapter-text">
-              <p className="chapter-label">{t('chapter5_label')}</p>
-              <h2 className="chapter-headline">{t('chapter5_title')}</h2>
-              <p className="chapter-body">{t('chapter5_body')}</p>
-            </div>
-            <div className="chapter-visual">
-              <SystemDiagram />
-            </div>
-          </div>
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter5_label')}</p>
+          <h2 className="chapter-headline">{t('chapter5_title')}</h2>
+          <p className="chapter-body">{t('chapter5_body')}</p>
         </section>
-      </div>
 
-      {/* ---------- Metrics ---------- */}
-      <section className="research-metrics">
-        <h2 className="research-metrics-title">{t('metrics_title')}</h2>
-        <div className="metrics-grid">
-          {METRICS.map((m) => (
-            <div className="metric" key={m.labelKey}>
-              <span
-                className="metric-value"
-                data-value={m.value}
-                data-prefix={m.prefix}
-                data-suffix={m.suffix}
-              >
-                {`${m.prefix}${m.value}${m.suffix}`}
-              </span>
-              <span className="metric-label">{t(m.labelKey)}</span>
-            </div>
-          ))}
+        <SystemDiagram />
+
+        <div className="sys-metrics-wrap">
+          <div className="sys-metrics">
+            {SYS_METRICS.map((m) => {
+              const Icon = m.Icon;
+              return (
+                <div className="sys-metric-card" key={m.labelKey}>
+                  <Icon className="sys-metric-icon" size={26} strokeWidth={1.75} />
+                  <span
+                    className="sys-metric-value"
+                    data-value={m.value}
+                    data-prefix={m.prefix}
+                    data-suffix={m.suffix}
+                    data-comma={m.comma ? '1' : undefined}
+                  >
+                    {m.display}
+                  </span>
+                  <span className="sys-metric-label">{t(m.labelKey)}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </section>
 
-      {/* ---------- GitHub CTA ---------- */}
-      <section className="research-cta">
-        <h2 className="research-cta-title">{t('cta_title')}</h2>
-        <p className="research-cta-subtitle">{t('cta_subtitle')}</p>
-        <a
-          className="btn-gold btn-gold-lg"
-          href={RESEARCH_REPO}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Github size={20} />
-          {t('github_label')}
-        </a>
-      </section>
+        <div className="research-cta-section">
+          <h3>{t('chapter5_cta_title')}</h3>
+          <p>{t('chapter5_cta_subtitle')}</p>
+          <a
+            className="cta-button-primary"
+            href={RESEARCH_REPO}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Github size={18} />
+            {t('github_label')} →
+          </a>
+        </div>
+      </div>
     </main>
   );
 }

@@ -1173,3 +1173,221 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   Chapter 5 — full system diagram + finale
+   ============================================================ */
+.system-diagram-container {
+  margin: 48px auto 0;
+  max-width: 1000px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.system-flow {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.system-block {
+  flex: 1 1 200px;
+  max-width: 260px;
+  min-width: 180px;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--block-dim);
+  border: 1px solid var(--block-accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  opacity: 0;
+}
+.system-label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--block-accent);
+  margin-bottom: 4px;
+}
+.system-sublabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.flow-arrow {
+  color: var(--cyan);
+  opacity: 0.35;
+  align-self: center;
+  flex-shrink: 0;
+}
+.system-down {
+  margin: 4px 0;
+}
+.system-processor-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+.processor-glow {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 217, 255, 0.25), transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.system-block--processor {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  box-shadow: 0 0 30px -8px var(--block-accent);
+}
+.system-feedback {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.feedback-arrow {
+  color: var(--gold);
+  opacity: 0.3;
+}
+.feedback-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* Chapter 5 metric cards */
+.sys-metrics-wrap {
+  max-width: 1000px;
+  margin: 40px auto 0;
+  padding: 0 80px;
+}
+.sys-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.sys-metric-card {
+  padding: 26px 16px;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.sys-metric-icon {
+  color: var(--cyan);
+}
+.sys-metric-value {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.2vw, 34px);
+  font-weight: 700;
+  color: var(--cyan);
+}
+.sys-metric-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Closing CTA */
+.research-cta-section {
+  text-align: center;
+  max-width: 1000px;
+  padding: 72px 40px 0;
+  margin: 72px auto 120px;
+}
+.research-cta-section h3 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.research-cta-section p {
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+}
+.cta-button-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  border: none;
+  border-radius: 12px;
+  color: #060914;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: none;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cta-button-primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+}
+
+@media (max-width: 900px) {
+  .sys-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .system-diagram-container {
+    padding: 24px;
+  }
+  .system-flow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .system-flow .flow-arrow {
+    transform: rotate(90deg);
+    align-self: center;
+  }
+  .system-block {
+    max-width: 100%;
+  }
+  .sys-metrics-wrap {
+    padding: 0 24px;
+  }
+  .sys-metrics {
+    grid-template-columns: 1fr;
+  }
+  .research-cta-section {
+    padding: 56px 24px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-block {
+    opacity: 1;
+  }
+  .flow-arrow,
+  .feedback-arrow {
+    opacity: 0.6;
+  }
+  .processor-glow {
+    opacity: 0.5;
+  }
+}
