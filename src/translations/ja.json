@@ -11,7 +11,16 @@
     "subtitle": "AI・AR・組み込みセンシングを通じて人間の能力を拡張するインテリジェントシステムを構築しています。現在、会津大学大学院に在籍中。",
     "cta_research": "研究を見る",
     "cta_projects": "作品を見る",
-    "scroll": "スクロールして探索"
+    "scroll": "スクロールして探索",
+    "role": "修士研究員",
+    "years": "2025 — 2027",
+    "stat_experience": "3年以上の実務経験",
+    "stat_projects": "10件以上のプロジェクト",
+    "stat_scholar": "米山奨学生",
+    "university": "会津大学、日本",
+    "preview_research_desc": "会津大学での手袋＋AR修士研究",
+    "preview_projects_desc": "Eコマース・不動産・AIアプリ",
+    "preview_achievements_desc": "奨学金・ハッカソン・資格"
   },
   "research": {
     "page_title": "研究",

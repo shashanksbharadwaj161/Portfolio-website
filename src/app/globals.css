@@ -320,3 +320,262 @@ button,
   visibility: hidden;
   pointer-events: none;
 }
+
+/* ---------- Hero ---------- */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 0 80px;
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  /* Static depth glow — Three.js replaces this in a later sprint */
+  background:
+    radial-gradient(circle at 78% 28%, rgba(0, 217, 255, 0.12), transparent 42%),
+    radial-gradient(circle at 12% 82%, rgba(124, 58, 237, 0.12), transparent 45%),
+    var(--bg-primary);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 700px;
+}
+
+.hero-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.hero-label::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--cyan);
+}
+
+.year-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(212, 165, 116, 0.25);
+}
+
+.hero-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(60px, 7vw, 96px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.btn-gold {
+  padding: 14px 28px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  background: transparent;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-gold:hover {
+  background: var(--gold);
+  color: #060914;
+}
+
+.btn-cyan {
+  padding: 14px 28px;
+  background: var(--cyan);
+  color: #060914;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.btn-cyan:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.floating-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.university-badge {
+  position: absolute;
+  bottom: 40px;
+  right: 80px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* ---------- Hero preview row ---------- */
+.preview-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 40px 80px 96px;
+  position: relative;
+  z-index: 2;
+}
+
+.preview-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  text-decoration: none;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.preview-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--card-accent);
+  box-shadow: 0 0 28px -8px var(--card-accent);
+}
+
+.preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  color: var(--card-accent);
+  background: var(--card-accent-dim);
+}
+
+.preview-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.preview-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.preview-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.preview-arrow {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.preview-card:hover .preview-arrow {
+  color: var(--card-accent);
+  transform: translate(2px, -2px);
+}
+
+/* ---------- Hero responsive ---------- */
+@media (max-width: 900px) {
+  .preview-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 0 24px;
+  }
+  .preview-row {
+    padding: 24px 24px 88px;
+  }
+  .scroll-indicator {
+    left: 24px;
+    bottom: 28px;
+  }
+  .university-badge {
+    right: 24px;
+    bottom: 92px;
+  }
+}
