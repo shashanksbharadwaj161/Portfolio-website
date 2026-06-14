@@ -1,4 +1,5 @@
 'use client';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import {
@@ -12,6 +13,11 @@ import {
   Layers,
   Trophy,
 } from 'lucide-react';
+
+// Three.js runs client-only to avoid hydration mismatches / SSR WebGL errors.
+const HeroParticles = dynamic(() => import('@/components/three/HeroParticles'), {
+  ssr: false,
+});
 
 /**
  * Renders the name with the last three letters in a cyan gradient.
@@ -78,8 +84,11 @@ export default function HomePage() {
     <main>
       {/* ---------- Section A: Hero ---------- */}
       <section className="hero-section">
-        {/* Three.js mounts here in a later sprint */}
-        <div id="hero-canvas" className="hero-canvas" aria-hidden="true" />
+        {/* Three.js particle field (over a static depth glow) + subtle grid */}
+        <div id="hero-canvas" className="hero-canvas" aria-hidden="true">
+          <HeroParticles />
+        </div>
+        <div className="hero-grid" aria-hidden="true" />
 
         <div className="hero-content">
           <div className="hero-label">

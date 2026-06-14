@@ -334,11 +334,24 @@ button,
 .hero-canvas {
   position: absolute;
   inset: 0;
-  /* Static depth glow — Three.js replaces this in a later sprint */
+  pointer-events: none;
+  /* Static depth glow that sits behind the Three.js particle field */
   background:
     radial-gradient(circle at 78% 28%, rgba(0, 217, 255, 0.12), transparent 42%),
     radial-gradient(circle at 12% 82%, rgba(124, 58, 237, 0.12), transparent 45%),
     var(--bg-primary);
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
 }
 
 .hero-content {
