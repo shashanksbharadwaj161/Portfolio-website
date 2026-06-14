@@ -138,8 +138,22 @@
     "scholarship_label": "PRESTIGIOUS SCHOLARSHIP",
     "scholarship_title": "Rotary Yoneyama Scholar",
     "scholarship_body": "Selected as a Rotary Yoneyama Memorial Foundation Scholar — one of Japan's most prestigious international scholarships, awarded to exceptional students demonstrating academic excellence, character, and leadership potential.",
-    "hackathons_title": "Hackathons",
+    "hackathons_title": "Hackathons & Competitions",
     "certs_title": "Certifications",
-    "experience_title": "Work Experience"
+    "experience_title": "Work Experience",
+    "hero_label": "ACHIEVEMENTS",
+    "hero_title": "Awards, Recognitions & Impact",
+    "hero_subtitle": "Three years of learning, building, and pushing boundaries.",
+    "scholar_subtitle": "Prestigious scholarship for excellence in innovation and community leadership.",
+    "scholar_year": "2025",
+    "scholar_stat": "1 of 50 scholars in Japan",
+    "timeline_title": "Journey Timeline",
+    "hackathons_subtitle": "Five competitions, countless lessons.",
+    "contact_title": "Let's Work Together",
+    "contact_subtitle": "Have a project in mind? Let's build something great.",
+    "contact_email": "Email",
+    "contact_whatsapp": "WhatsApp",
+    "contact_linkedin": "LinkedIn",
+    "contact_github": "GitHub"
   }
 }

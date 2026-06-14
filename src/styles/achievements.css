@@ -1,0 +1,429 @@
+/* ============================================================
+   Achievements page
+   ============================================================ */
+.achievements-page {
+  min-height: 100vh;
+  padding: 140px 40px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Hero */
+.achievements-hero {
+  margin-bottom: 110px;
+  text-align: center;
+}
+.achievements-hero-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.achievements-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.achievements-hero-subtitle {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Scholar spotlight */
+.scholar-spotlight {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 64px;
+  align-items: center;
+  margin: 0 auto 120px;
+}
+.scholar-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(212, 165, 116, 0.1));
+  border: 2px solid rgba(0, 217, 255, 0.3);
+  border-radius: 50%;
+  animation: scholarPulse 3s ease-in-out infinite;
+}
+@keyframes scholarPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 44px rgba(0, 217, 255, 0.5);
+  }
+}
+.scholar-icon {
+  color: var(--gold);
+  filter: drop-shadow(0 0 20px rgba(212, 165, 116, 0.5));
+}
+.scholar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.scholar-kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.scholar-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.5vw, 32px);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.scholar-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.scholar-details {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.scholar-detail {
+  padding: 12px 20px;
+  background: rgba(0, 217, 255, 0.1);
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  border-radius: 8px;
+}
+.scholar-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.scholar-stat {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.scholar-description {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-top: 8px;
+}
+
+/* Timeline */
+.timeline-section {
+  margin: 0 auto 120px;
+  max-width: 760px;
+}
+.timeline-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 56px;
+  text-align: center;
+}
+.timeline-container {
+  position: relative;
+  padding: 8px 0;
+}
+.timeline-line {
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--cyan), var(--gold), var(--cyan));
+  transform-origin: top;
+}
+.timeline-event {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 36px;
+  position: relative;
+  padding-left: 100px;
+}
+.timeline-event:last-child {
+  margin-bottom: 0;
+}
+.timeline-marker {
+  position: absolute;
+  left: 0;
+  top: -4px;
+  width: 60px;
+  height: 60px;
+  background: var(--bg-card);
+  border: 2px solid var(--cyan);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timeline-icon {
+  font-size: 24px;
+}
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+}
+.timeline-year {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 0.05em;
+}
+.timeline-event-text {
+  font-size: 16px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Hackathons */
+.hackathons-section {
+  margin-bottom: 120px;
+}
+.hackathons-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.hackathons-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 auto 56px;
+  max-width: 600px;
+}
+.hackathons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+.hackathon-card {
+  padding: 32px 24px;
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(124, 58, 237, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  text-align: center;
+  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+.hackathon-card:hover {
+  border-color: rgba(0, 217, 255, 0.3);
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(124, 58, 237, 0.1));
+  transform: translateY(-8px);
+}
+.hackathon-icon {
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.hackathon-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.hackathon-award {
+  font-size: 14px;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.hackathon-project {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.hackathon-year {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Certifications */
+.certifications-section {
+  margin: 0 auto 120px;
+  max-width: 760px;
+}
+.certifications-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 48px;
+  text-align: center;
+}
+.certifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cert-item {
+  display: flex;
+  gap: 18px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  align-items: flex-start;
+  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+.cert-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 217, 255, 0.2);
+  transform: translateX(8px);
+}
+.cert-icon {
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.cert-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cert-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.cert-issuer {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Contact */
+.contact-section {
+  text-align: center;
+  padding: 72px 40px;
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(212, 165, 116, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+.contact-content {
+  margin-bottom: 36px;
+}
+.contact-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.contact-subtitle {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+}
+.contact-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.contact-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+.contact-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-4px);
+}
+.contact-email:hover {
+  border-color: rgba(0, 217, 255, 0.4);
+  color: var(--cyan);
+}
+.contact-whatsapp:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: var(--green);
+}
+.contact-linkedin:hover {
+  border-color: rgba(0, 150, 255, 0.4);
+  color: #4a90d9;
+}
+.contact-github:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scholar-badge {
+    animation: none;
+  }
+  .hackathon-card,
+  .cert-item,
+  .contact-button {
+    transition: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .achievements-page {
+    padding: 100px 20px 48px;
+  }
+  .scholar-spotlight {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .scholar-badge {
+    width: 150px;
+    height: 150px;
+  }
+  .hackathons-grid {
+    grid-template-columns: 1fr;
+  }
+  .contact-buttons {
+    gap: 12px;
+  }
+  .contact-button {
+    width: 100%;
+    justify-content: center;
+  }
+  .timeline-event {
+    padding-left: 64px;
+    gap: 20px;
+  }
+  .timeline-marker {
+    width: 48px;
+    height: 48px;
+    left: 6px;
+  }
+  .timeline-line {
+    left: 24px;
+  }
+}

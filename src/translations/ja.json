@@ -138,8 +138,22 @@
     "scholarship_label": "名誉ある奨学金",
     "scholarship_title": "ロータリー米山奨学生",
     "scholarship_body": "ロータリー米山記念奨学財団の奨学生として選出——学業優秀、品性、リーダーシップの可能性を示す優秀な学生に授与される、日本で最も権威ある国際奨学金の一つ。",
-    "hackathons_title": "ハッカソン",
+    "hackathons_title": "ハッカソンとコンテスト",
     "certs_title": "資格・認定",
-    "experience_title": "職務経歴"
+    "experience_title": "職務経歴",
+    "hero_label": "実績",
+    "hero_title": "受賞、認定 & インパクト",
+    "hero_subtitle": "3年間の学習、構築、そして境界を押し広げる。",
+    "scholar_subtitle": "イノベーションとコミュニティーリーダーシップにおける卓越さのための名門奨学金。",
+    "scholar_year": "2025年",
+    "scholar_stat": "日本の50人の奨学生のうち1人",
+    "timeline_title": "キャリアタイムライン",
+    "hackathons_subtitle": "5つのコンペティション、無数の教訓。",
+    "contact_title": "一緒に仕事をしましょう",
+    "contact_subtitle": "プロジェクトをお持ちですか？素晴らしいものを構築しましょう。",
+    "contact_email": "メール",
+    "contact_whatsapp": "WhatsApp",
+    "contact_linkedin": "LinkedIn",
+    "contact_github": "GitHub"
   }
 }
