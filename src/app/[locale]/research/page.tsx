@@ -7,7 +7,7 @@ import { ChevronDown, Github } from 'lucide-react';
 import CircuitBackground from '@/components/research/CircuitBackground';
 import HandDiagram from '@/components/research/HandDiagram';
 import GloveStage from '@/components/research/GloveStage';
-import HanoiDiagram from '@/components/research/HanoiDiagram';
+import HanoiDemo from '@/components/research/HanoiDemo';
 import GlassesDiagram from '@/components/research/GlassesDiagram';
 import SystemDiagram from '@/components/research/SystemDiagram';
 import { cn } from '@/lib/utils';
@@ -265,18 +265,12 @@ export default function ResearchPage() {
 
       {/* ---------- Chapter 3 ---------- */}
       <div id="chapter-3">
-        <section className="chapter chapter--reverse">
-          <div className="chapter-grid">
-            <div className="chapter-text">
-              <p className="chapter-label">{t('chapter3_label')}</p>
-              <h2 className="chapter-headline">{t('chapter3_title')}</h2>
-              <p className="chapter-body">{t('chapter3_body')}</p>
-            </div>
-            <div className="chapter-visual">
-              <HanoiDiagram />
-            </div>
-          </div>
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter3_label')}</p>
+          <h2 className="chapter-headline">{t('chapter3_title')}</h2>
+          <p className="chapter-body">{t('chapter3_body')}</p>
         </section>
+        <HanoiDemo />
       </div>
 
       {/* ---------- Chapter 4 ---------- */}

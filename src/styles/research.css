@@ -605,3 +605,279 @@
     display: none;
   }
 }
+
+/* ---------- Intro-style chapter (centered) ---------- */
+.chapter--intro {
+  text-align: center;
+}
+.chapter--intro .chapter-body {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================================
+   Chapter 3 — Tower of Hanoi demo
+   ============================================================ */
+.chapter3-demo {
+  max-width: 1000px;
+  margin: 10px auto 0;
+  padding: 0 80px;
+}
+.hanoi-demo {
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  position: relative;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.panel-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 10px;
+}
+.panel-kicker.gold {
+  color: var(--gold);
+}
+.instruction-panel {
+  grid-column: 1;
+  padding: 20px;
+  background: rgba(0, 217, 255, 0.05);
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+}
+.instruction-text {
+  min-height: 3.2em;
+}
+.type-caret {
+  color: var(--cyan);
+  animation: caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink {
+  50% {
+    opacity: 0;
+  }
+}
+.sensor-panel {
+  grid-column: 3;
+  padding: 20px;
+  background: rgba(212, 165, 116, 0.05);
+  border: 1px solid rgba(212, 165, 116, 0.2);
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sensor-reading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sensor-label {
+  width: 70px;
+  color: var(--text-secondary);
+}
+.sensor-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sensor-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  width: 50%;
+  transition: width 0.3s ease;
+}
+.sensor-value {
+  width: 42px;
+  text-align: right;
+  color: var(--cyan);
+}
+.tower-container {
+  grid-column: 2;
+  position: relative;
+  height: 280px;
+}
+.tower-pegs {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding-bottom: 26px;
+}
+.peg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 33%;
+}
+.peg-shaft {
+  width: 4px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+.peg-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 10px;
+}
+.tower-base {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 22px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+.tower-rings {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.ring {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 20px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  will-change: transform;
+}
+.ring-3 {
+  width: 140px;
+  background: rgba(124, 58, 237, 0.3);
+  border-color: #7c3aed;
+  color: #c4b5fd;
+}
+.ring-2 {
+  width: 100px;
+  background: rgba(212, 165, 116, 0.3);
+  border-color: #d4a574;
+  color: #e8cfa6;
+}
+.ring-1 {
+  width: 60px;
+  background: rgba(0, 217, 255, 0.3);
+  border-color: #00d9ff;
+  color: #9fe9ff;
+}
+.demo-success {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--green);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+.demo-stats {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-around;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.demo-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.demo-stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--cyan);
+}
+.demo-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1000px;
+  margin: 32px auto 0;
+  padding: 0 80px;
+}
+.demo-metric {
+  padding: 24px 16px;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  text-align: center;
+}
+.demo-metric-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+.demo-metric-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .chapter3-demo,
+  .demo-metrics {
+    padding: 0 24px;
+  }
+  .hanoi-demo {
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
+  .instruction-panel,
+  .sensor-panel,
+  .tower-container {
+    grid-column: auto;
+  }
+  .demo-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .type-caret {
+    animation: none;
+  }
+  .sensor-bar-fill {
+    transition: none;
+  }
+}

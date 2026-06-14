@@ -69,7 +69,20 @@
     "phase4_card": "Gyroscope + Accelerometer + Magnetometer",
     "metrics_title": "By the Numbers",
     "cta_title": "Read the Full Research on GitHub",
-    "cta_subtitle": "Ray-Ban Meta Display + Pressure Data Glove Integration"
+    "cta_subtitle": "Ray-Ban Meta Display + Pressure Data Glove Integration",
+    "demo_guidance": "Guidance",
+    "demo_sensors": "Sensor Data",
+    "demo_instruction": "Pick ring {ring} from Peg {from} and place it on Peg {to}.",
+    "demo_move": "Move",
+    "demo_time": "Time",
+    "demo_accuracy": "Accuracy",
+    "demo_solved": "Solved!",
+    "demo_sensor_thumb": "Thumb",
+    "demo_sensor_index": "Index",
+    "demo_sensor_middle": "Middle",
+    "demo_metric1_label": "Sensor Readings / sec",
+    "demo_metric2_label": "Instruction Accuracy",
+    "demo_metric3_label": "Response Latency"
   },
   "projects": {
     "page_title": "Projects & Work",

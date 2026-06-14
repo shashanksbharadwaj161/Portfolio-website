@@ -69,7 +69,20 @@
     "phase4_card": "ジャイロスコープ + 加速度計 + 磁気センサー",
     "metrics_title": "数字で見る",
     "cta_title": "GitHubで研究の全文を読む",
-    "cta_subtitle": "Ray-Ban Metaディスプレイ + 圧力データグローブの統合"
+    "cta_subtitle": "Ray-Ban Metaディスプレイ + 圧力データグローブの統合",
+    "demo_guidance": "ガイダンス",
+    "demo_sensors": "センサーデータ",
+    "demo_instruction": "リング{ring}をペグ{from}から取り、ペグ{to}に置いてください。",
+    "demo_move": "手数",
+    "demo_time": "時間",
+    "demo_accuracy": "精度",
+    "demo_solved": "完了！",
+    "demo_sensor_thumb": "親指",
+    "demo_sensor_index": "人差し指",
+    "demo_sensor_middle": "中指",
+    "demo_metric1_label": "センサー読み取り / 秒",
+    "demo_metric2_label": "指示精度",
+    "demo_metric3_label": "応答遅延"
   },
   "projects": {
     "page_title": "プロジェクト・作品",
