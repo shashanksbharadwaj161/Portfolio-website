@@ -1,0 +1,19 @@
+/*
+ * Supplementary glass / neumorphism helpers.
+ * The core utilities (.glass, .glass-cyan, .glass-gold, .neo) live in globals.css.
+ * These add interaction states used by reusable UI components.
+ */
+
+.glass-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.glass-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 217, 255, 0.25);
+}
+
+.neo-inset {
+  background: var(--bg-card);
+  box-shadow: inset 6px 6px 12px #0a0f1a, inset -6px -6px 12px #182234;
+  border-radius: 16px;
+}

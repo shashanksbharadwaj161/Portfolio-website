@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "research": "研究",
+    "projects": "プロジェクト",
+    "achievements": "実績"
+  },
+  "hero": {
+    "greeting": "はじめまして、",
+    "name": "シャシャンク・S・バラドワジ",
+    "title": "修士研究員 & フルスタック開発者",
+    "subtitle": "AI・AR・組み込みセンシングを通じて人間の能力を拡張するインテリジェントシステムを構築しています。現在、会津大学大学院に在籍中。",
+    "cta_research": "研究を見る",
+    "cta_projects": "作品を見る",
+    "scroll": "スクロールして探索"
+  },
+  "research": {
+    "page_title": "研究",
+    "chapter1_label": "第1章",
+    "chapter1_title": "始まり：ラボで生まれたアイデア",
+    "chapter1_body": "もし手袋が人間の手のあらゆる動き——圧力、角度、運動——を感知し、それをデジタルインテリジェンスに変換できたら？その問いが会津大学での修士論文の出発点となりました。",
+    "chapter2_label": "第2章",
+    "chapter2_title": "手袋の製作：e-テキスタイルとエンジニアリングの融合",
+    "chapter2_body": "導電性の布地から始まり、各指先と手のひらの領域にVelostat圧力センサーを手縫いで取り付けました。3D空間の向きを追跡するIMUセンサーと組み合わせることで、手袋は完全な手センシングシステムとなりました。",
+    "chapter3_label": "第3章",
+    "chapter3_title": "実証：ハノイの塔を解く",
+    "chapter3_body": "最初の課題は、手袋が複雑な問題解決をガイドできることを証明することでした。ハノイの塔——精密で論理的な操作を必要とする古典的なパズル——がテストケースとなりました。手袋がグリップを読み取り、デスクトップUIがリアルタイムでセンサーデータを処理し、リングをどこに置くべきか正確に指示します。",
+    "chapter4_label": "第4章",
+    "chapter4_title": "ARによる革新：Ray-Ban Metaとの統合",
+    "chapter4_body": "ブレークスルー：UIをデスクトップからユーザーの視野へ移行。Ray-Ban Metaスマートグラスとシステムを統合し、センサーデータをデバイス上で直接処理します。これにより、ガイダンスがユーザーの視野に組み込まれ、スクリーン不要、完全な拡張現実を実現しました。",
+    "chapter5_label": "第5章",
+    "chapter5_title": "完全なシステム：人間と機械のシームレスな融合",
+    "chapter5_body": "手袋を装着。グラスを装着。目の前にパズル。完全なシステムが手の動きを追跡し、意図を理解し、視野にリアルタイムのガイダンスをオーバーレイ——ハードウェア、AI、拡張現実のシームレスな融合。",
+    "metrics_accuracy": "センサー精度",
+    "metrics_latency": "応答遅延",
+    "metrics_sensors": "圧力センシングポイント",
+    "metrics_axes": "IMU追跡軸数",
+    "github_label": "GitHubで研究を見る",
+    "thesis_label": "修士論文研究",
+    "university_label": "会津大学、日本"
+  },
+  "projects": {
+    "page_title": "プロジェクト・作品",
+    "subtitle": "Eコマース、不動産、AI、ユーティリティ分野で構築したウェブサイト・アプリ・ツール。",
+    "view_live": "ライブを見る",
+    "view_github": "GitHub",
+    "categories": {
+      "all": "すべて",
+      "ecommerce": "Eコマース",
+      "realestate": "不動産",
+      "ai": "AI・ユーティリティ"
+    }
+  },
+  "achievements": {
+    "page_title": "実績",
+    "subtitle": "私の歩みを形作った奨学金、ハッカソン、資格認定。",
+    "scholarship_label": "名誉ある奨学金",
+    "scholarship_title": "ロータリー米山奨学生",
+    "scholarship_body": "ロータリー米山記念奨学財団の奨学生として選出——学業優秀、品性、リーダーシップの可能性を示す優秀な学生に授与される、日本で最も権威ある国際奨学金の一つ。",
+    "hackathons_title": "ハッカソン",
+    "certs_title": "資格・認定",
+    "experience_title": "職務経歴"
+  }
+}
