@@ -103,11 +103,8 @@
 .project-image {
   width: 100%;
   height: 200px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 20px;
   position: relative;
+  overflow: hidden;
 }
 .project-ecommerce {
   background: linear-gradient(135deg, rgba(0, 217, 255, 0.12), rgba(212, 165, 116, 0.12));
@@ -119,11 +116,20 @@
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(212, 165, 116, 0.12));
 }
 .project-category-tag {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--cyan);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  background: rgba(6, 9, 20, 0.7);
+  padding: 3px 8px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .project-content {
@@ -246,6 +252,8 @@
 .modal-image {
   width: 100%;
   height: 240px;
+  position: relative;
+  overflow: hidden;
 }
 .modal-body {
   padding: 40px;

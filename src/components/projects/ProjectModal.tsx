@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { ExternalLink, Github, X } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -60,7 +61,17 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           <X size={22} />
         </button>
 
-        <div className={`modal-image project-${project.category}`} aria-hidden="true" />
+        <div className={`modal-image project-${project.category}`} aria-hidden="true">
+          {project.image && (
+            <Image
+              src={project.image}
+              alt=""
+              fill
+              sizes="700px"
+              style={{ objectFit: 'cover' }}
+            />
+          )}
+        </div>
 
         <div className="modal-body">
           <h2 className="modal-title">{title}</h2>

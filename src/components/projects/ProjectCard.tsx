@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import type { Project } from '@/lib/constants';
 
@@ -22,6 +23,15 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
   return (
     <button type="button" className="project-card" onClick={onClick}>
       <span className={`project-image project-${project.category}`}>
+        {project.image && (
+          <Image
+            src={project.image}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 380px"
+            style={{ objectFit: 'cover' }}
+          />
+        )}
         <span className="project-category-tag">{t(CATEGORY_LABEL[project.category])}</span>
       </span>
 
