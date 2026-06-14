@@ -1,0 +1,607 @@
+/* ============================================================
+   Research page
+   ============================================================ */
+
+.research-page {
+  position: relative;
+}
+
+/* ---------- Hero ---------- */
+.research-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 80px;
+  overflow: hidden;
+}
+
+.circuit-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+.circuit-trace {
+  fill: none;
+  stroke: rgba(0, 217, 255, 0.18);
+  stroke-width: 1.4;
+  stroke-dasharray: 14 320;
+  stroke-dashoffset: 0;
+  animation: circuitFlow 6s linear infinite;
+}
+.circuit-node {
+  fill: var(--cyan);
+  opacity: 0.25;
+  animation: nodePulse 3s ease-in-out infinite;
+}
+@keyframes circuitFlow {
+  to {
+    stroke-dashoffset: -334;
+  }
+}
+@keyframes nodePulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 6px var(--cyan));
+  }
+}
+
+.research-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+}
+.research-hero-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 24px;
+}
+.research-title {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.research-subtitle {
+  font-family: var(--font-mono);
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+.research-badges {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.research-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+}
+
+.research-hero-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  padding: 0 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 2;
+}
+.research-scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+}
+
+/* ---------- Story progress dots ---------- */
+.progress-dots {
+  position: fixed;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 20;
+}
+.progress-rail {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-50%);
+  z-index: -1;
+}
+.progress-fill {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--cyan), rgba(0, 217, 255, 0.2));
+  transform: translateX(-50%);
+  height: 0;
+  transition: height 0.6s ease;
+  z-index: -1;
+}
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: none;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0;
+}
+.progress-dot.active {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(0, 217, 255, 0.5);
+  width: 16px;
+  height: 16px;
+}
+.progress-label {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%) translateX(20px);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+.progress-dot:hover .progress-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ---------- Chapters ---------- */
+.chapter {
+  position: relative;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 120px 80px;
+}
+.chapter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.chapter--reverse .chapter-visual {
+  order: -1;
+}
+.chapter-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  margin-bottom: 16px;
+}
+.chapter-headline {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+.chapter-body {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 500px;
+}
+.chapter-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animation initial states (GSAP / CSS reveal) */
+.chapter-label {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+.chapter-headline {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.chapter-body {
+  opacity: 0;
+}
+.chapter-visual {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+/* ---------- Hand SVG (Chapter 1) ---------- */
+.hand-svg {
+  width: 300px;
+  max-width: 80%;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.15));
+}
+
+/* ---------- Story SVGs (Chapters 3–5) ---------- */
+.story-svg {
+  width: 360px;
+  max-width: 90%;
+  height: auto;
+}
+.dot-pulse {
+  animation: sensorPulse 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.ring-pulse {
+  animation: ringPulse 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.hanoi-move {
+  animation: float 2.4s ease-in-out infinite;
+}
+.flow-line {
+  animation: dashFlow 1s linear infinite;
+}
+.imu-axes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin 12s linear infinite;
+}
+@keyframes sensorPulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+@keyframes ringPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+@keyframes dashFlow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Chapter 2: pinned glove stage ---------- */
+.chapter2-section {
+  position: relative;
+  height: 400vh;
+  background: #0a0b15;
+}
+.chapter2-pin {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.glove-stage {
+  position: relative;
+  width: min(1100px, 92vw);
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.glove-figure {
+  position: relative;
+  z-index: 2;
+}
+.glove-svg {
+  width: clamp(220px, 32vw, 380px);
+  height: auto;
+  filter: drop-shadow(0 0 26px rgba(0, 217, 255, 0.18));
+}
+.glove-svg .g-sensors,
+.glove-svg .g-velostat,
+.glove-svg .g-imu {
+  opacity: 0;
+}
+
+.phase-watermark {
+  position: absolute;
+  left: 4%;
+  top: 8%;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(120px, 22vw, 280px);
+  line-height: 1;
+  color: #fff;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.phase-panels {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(360px, 40vw);
+  z-index: 3;
+}
+.phase-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  opacity: 0;
+}
+.phase-panel.panel-1 {
+  opacity: 1;
+}
+.phase-kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  margin-bottom: 12px;
+}
+.phase-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.phase-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.info-card {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.info-card-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+.info-card--gold .info-card-label {
+  color: var(--gold);
+}
+.info-card--purple .info-card-label {
+  color: var(--purple);
+}
+.info-card-value {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ---------- Metrics ---------- */
+.research-metrics {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 80px 40px;
+  text-align: center;
+}
+.research-metrics-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.5vw, 36px);
+  font-weight: 600;
+  margin-bottom: 48px;
+  color: var(--text-primary);
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.metric {
+  padding: 28px 16px;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+}
+.metric-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 700;
+  color: var(--cyan);
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+/* ---------- GitHub CTA ---------- */
+.research-cta {
+  text-align: center;
+  padding: 100px 80px 140px;
+}
+.research-cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+.research-cta-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+}
+.btn-gold-lg {
+  padding: 18px 36px;
+  font-size: 16px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .chapter-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .chapter--reverse .chapter-visual {
+    order: 0;
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .phase-panels {
+    width: 88%;
+    left: 6%;
+    right: auto;
+  }
+  .progress-dots {
+    right: 16px;
+  }
+}
+@media (max-width: 768px) {
+  .research-hero,
+  .chapter,
+  .research-metrics,
+  .research-cta {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .research-hero-foot {
+    padding: 0 24px;
+  }
+  .progress-dots {
+    display: none;
+  }
+}
+
+/* ---------- Hero/chapter intro initial states ---------- */
+.research-hero-label,
+.research-title,
+.research-subtitle,
+.research-badges > *,
+.research-hero-foot > * {
+  opacity: 0;
+}
+
+/* ---------- Reduced motion: reveal everything, no pin/scrub ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .research-hero-label,
+  .research-title,
+  .research-subtitle,
+  .research-badges > *,
+  .research-hero-foot > *,
+  .chapter-label,
+  .chapter-headline,
+  .chapter-body,
+  .chapter-visual,
+  .phase-panel {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .circuit-trace,
+  .circuit-node,
+  .dot-pulse,
+  .ring-pulse,
+  .hanoi-move,
+  .flow-line,
+  .imu-axes {
+    animation: none !important;
+  }
+  .glove-svg .g-sensors,
+  .glove-svg .g-velostat,
+  .glove-svg .g-imu {
+    opacity: 1;
+  }
+  .chapter2-section {
+    height: auto;
+  }
+  .chapter2-pin {
+    height: auto;
+    padding: 80px 0;
+  }
+  .glove-stage {
+    height: auto;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .phase-panels {
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .phase-panel {
+    position: static;
+    width: 100%;
+  }
+  .phase-watermark {
+    display: none;
+  }
+}
