@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -9,10 +10,20 @@ import CircuitBackground from '@/components/research/CircuitBackground';
 import HandDiagram from '@/components/research/HandDiagram';
 import GloveStage from '@/components/research/GloveStage';
 import HanoiDemo from '@/components/research/HanoiDemo';
-import ArGlassesReveal from '@/components/research/ArGlassesReveal';
 import SystemDiagram from '@/components/research/SystemDiagram';
 import { cn } from '@/lib/utils';
 import '@/styles/research.css';
+
+// The cinematic Ray-Ban Meta scene pulls in Three.js + post-processing, so it
+// is code-split and loaded only on the client (it renders nothing on the server).
+const ArGlassesReveal = dynamic(() => import('@/components/research/ArGlassesReveal'), {
+  ssr: false,
+  loading: () => (
+    <div className="ar-glasses-wrapper">
+      <div className="ar-three-mount" />
+    </div>
+  ),
+});
 
 const RESEARCH_REPO = 'https://github.com/shashanksbharadwaj161/rayban-dataglove-hanoi';
 
