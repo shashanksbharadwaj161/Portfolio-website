@@ -3,7 +3,11 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { filmStore } from './filmStore';
-import { particleMorph, particleFade, lerp } from './scenes';
+import { particleMorph, particleFade, smoothstep, lerp } from './scenes';
+
+// Dust starts cyan, shifts to the teal of the conductive thread as it prints.
+const DUST_COLOR = new THREE.Color(0x00d9ff);
+const THREAD_COLOR = new THREE.Color(0x00e5cc);
 
 // A single particle buffer that reconfigures: a dust cloud in the cold open,
 // then travels onto the sampled glove surface to "print" it in Scene 1, then
@@ -67,6 +71,8 @@ export default function Particles({ targets }: { targets: Float32Array }) {
     }
     geometry.attributes.position.needsUpdate = true;
     material.opacity = 0.2 + 0.65 * fade;
+    // Deterministic cyan → teal shift as the dust becomes thread.
+    material.color.copy(DUST_COLOR).lerp(THREAD_COLOR, smoothstep(0.45, 0.75, morph));
   });
 
   return <points ref={pointsRef} geometry={geometry} material={material} />;

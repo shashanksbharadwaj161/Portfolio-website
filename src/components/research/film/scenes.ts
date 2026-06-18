@@ -71,6 +71,8 @@ export function getCamera(p: number): CamState {
 
 /** 0 → 1 as the solid glove fades in across Scene 1. */
 export const gloveReveal = (p: number) => smoothstep(0.3, 0.62, p);
+/** 0 → 1 as the teal sensor dots ignite (after the glove has formed). */
+export const sensorIgnite = (p: number) => smoothstep(0.55, 0.85, p);
 /** 0 → 1 as dust particles travel from the cloud onto the glove surface. */
 export const particleMorph = (p: number) => smoothstep(0.28, 0.55, p);
 /** 1 → 0 as particles dissolve once the solid glove has taken over. */
