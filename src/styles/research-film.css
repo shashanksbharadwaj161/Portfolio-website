@@ -1,0 +1,183 @@
+/* ============================================================
+   Research Film — persistent WebGL cinematic experience
+   Scaffold + Scene 0 (cold open) + Scene 1 (glove materialize)
+   ============================================================ */
+
+/* ── Desktop + motion shows the film; everything else shows the chapters ── */
+.research-film {
+  display: none;
+}
+.research-fallback {
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+  .research-film {
+    display: block;
+  }
+  .research-fallback {
+    display: none;
+  }
+}
+
+/* ── Fixed WebGL canvas behind everything ── */
+.film-canvas-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #010508;
+}
+.film-canvas-wrap canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Scroll length: drives the master timeline (Scenes 0 + 1 scaffold) ── */
+.film-scroll-spacer {
+  position: relative;
+  width: 100%;
+  height: 700vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Fixed narrative text layer ── */
+.research-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.film-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8vw;
+  opacity: 0;
+  will-change: opacity, transform, filter;
+  transition: opacity 0.9s ease, transform 0.9s ease, filter 0.9s ease;
+}
+.film-text--center {
+  align-items: center;
+  text-align: center;
+  transform: translateY(26px);
+  filter: blur(10px);
+}
+.film-text--left {
+  align-items: flex-start;
+  text-align: left;
+  max-width: 640px;
+  transform: translateX(-34px);
+  filter: blur(10px);
+}
+.film-text.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* ── Scene 0 — cold open / title ── */
+.film-kicker {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(0, 217, 255, 0.65);
+  margin-bottom: 22px;
+}
+.film-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(44px, 8.5vw, 108px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0 auto;
+  max-width: 16ch;
+}
+.film-sub {
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.6vw, 20px);
+  color: var(--text-secondary);
+  max-width: 60ch;
+  margin: 26px auto 0;
+  line-height: 1.6;
+}
+.film-scrollhint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(240, 244, 255, 0.4);
+  margin-top: 54px;
+  animation: filmHintPulse 2.4s ease-in-out infinite;
+}
+@keyframes filmHintPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* ── Scene 1 — glove materialize ── */
+.film-chapter-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 18px;
+}
+.film-chapter-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(30px, 4.4vw, 56px);
+  line-height: 1.1;
+  margin: 0 0 22px;
+}
+.film-chapter-body {
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+.film-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 34px;
+}
+.film-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(240, 244, 255, 0.55);
+}
+.film-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.film-legend-dot.cyan {
+  background: #00d9ff;
+  box-shadow: 0 0 8px #00d9ff;
+}
+.film-legend-dot.gold {
+  background: #d4a574;
+  box-shadow: 0 0 8px #d4a574;
+}
+.film-legend-dot.purple {
+  background: #7c3aed;
+  box-shadow: 0 0 8px #7c3aed;
+}

@@ -1,0 +1,392 @@
+'use client';
+import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ChevronDown, Gauge, Github, Hand, Radio, RefreshCw, Target, Zap } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import CircuitBackground from '@/components/research/CircuitBackground';
+import HandDiagram from '@/components/research/HandDiagram';
+import GloveStage from '@/components/research/GloveStage';
+import HanoiDemo from '@/components/research/HanoiDemo';
+import SystemDiagram from '@/components/research/SystemDiagram';
+import { cn } from '@/lib/utils';
+import '@/styles/research.css';
+
+// The cinematic Ray-Ban Meta scene pulls in Three.js + post-processing, so it
+// is code-split and loaded only on the client (it renders nothing on the server).
+const ArGlassesReveal = dynamic(() => import('@/components/research/ArGlassesReveal'), {
+  ssr: false,
+  loading: () => (
+    <div className="ar-glasses-wrapper">
+      <div className="ar-three-mount" />
+    </div>
+  ),
+});
+
+const RESEARCH_REPO = 'https://github.com/shashanksbharadwaj161/rayban-dataglove-hanoi';
+
+interface SysMetric {
+  Icon: LucideIcon;
+  labelKey: string;
+  display: string;
+  value?: number;
+  prefix?: string;
+  suffix?: string;
+  comma?: boolean;
+}
+
+const SYS_METRICS: SysMetric[] = [
+  { Icon: Target, labelKey: 'chapter5_metric_accuracy', display: '95%', value: 95, suffix: '%' },
+  { Icon: Zap, labelKey: 'chapter5_metric_latency', display: '~50ms', value: 50, prefix: '~', suffix: 'ms' },
+  { Icon: Radio, labelKey: 'chapter5_metric_sensors', display: '8 + 9-DOF' },
+  {
+    Icon: RefreshCw,
+    labelKey: 'chapter5_metric_readings',
+    display: '1,200+/s',
+    value: 1200,
+    suffix: '+/s',
+    comma: true,
+  },
+];
+
+/**
+ * The original scroll-driven research story. On the film route this is the
+ * mobile / reduced-motion fallback: when `active` is false it renders for SEO
+ * but skips all of its ScrollTrigger setup and heavy 3D mounts.
+ */
+export default function ResearchChapters({ active }: { active: boolean }) {
+  const t = useTranslations('research');
+  const rootRef = useRef<HTMLElement>(null);
+  const [activeChapter, setActiveChapter] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    gsap.registerPlugin(ScrollTrigger);
+    const root = rootRef.current;
+    if (!root) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const ctx = gsap.context(() => {
+      // Active-chapter tracking for the progress dots (runs even when reduced)
+      for (let i = 1; i <= 5; i++) {
+        ScrollTrigger.create({
+          trigger: `#chapter-${i}`,
+          start: 'top 55%',
+          end: 'bottom 45%',
+          onToggle: (self) => self.isActive && setActiveChapter(i),
+        });
+      }
+      ScrollTrigger.create({
+        trigger: '.research-hero',
+        start: 'top 40%',
+        end: 'bottom 45%',
+        onToggle: (self) => self.isActive && setActiveChapter(0),
+      });
+
+      if (reduced) return;
+
+      // Hero entrance
+      gsap
+        .timeline({ delay: 0.2, defaults: { ease: 'power3.out' } })
+        .fromTo('.research-hero-label', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
+        .fromTo('.research-title', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.2')
+        .fromTo('.research-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
+        .fromTo(
+          '.research-badges > *',
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 },
+          '-=0.3'
+        )
+        .fromTo(
+          '.research-hero-foot > *',
+          { opacity: 0 },
+          { opacity: 1, duration: 0.5, stagger: 0.1 },
+          '-=0.2'
+        );
+
+      gsap.to('.research-scroll-chevron', {
+        y: 6,
+        repeat: -1,
+        yoyo: true,
+        duration: 0.8,
+        ease: 'sine.inOut',
+      });
+
+      // Per-chapter entrance reveals
+      gsap.utils.toArray<HTMLElement>('.chapter').forEach((ch) => {
+        const label = ch.querySelector('.chapter-label');
+        const headline = ch.querySelector('.chapter-headline');
+        const body = ch.querySelector('.chapter-body');
+        const visual = ch.querySelector('.chapter-visual');
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: ch, start: 'top 70%' },
+          defaults: { ease: 'power3.out' },
+        });
+        if (label) tl.to(label, { opacity: 1, x: 0, duration: 0.6 }, 0);
+        if (headline) tl.to(headline, { opacity: 1, y: 0, duration: 0.6 }, 0.15);
+        if (body) tl.to(body, { opacity: 1, duration: 0.6 }, 0.3);
+        if (visual) tl.to(visual, { opacity: 1, x: 0, duration: 0.6 }, 0.25);
+      });
+
+      // Chapter 1: hand draws itself, sensors pop, neural lines fade
+      const hand = root.querySelector('.hand-svg');
+      if (hand) {
+        const outline = hand.querySelectorAll(':scope > path, :scope > line');
+        const dots = hand.querySelectorAll('.sensor-dot');
+        const neural = hand.querySelector('.neural-lines');
+        outline.forEach((el) => {
+          const len = (el as SVGGeometryElement).getTotalLength();
+          gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+        });
+        gsap.set(dots, { opacity: 0, scale: 0, transformOrigin: 'center', transformBox: 'fill-box' });
+        if (neural) gsap.set(neural, { opacity: 0 });
+
+        gsap
+          .timeline({ scrollTrigger: { trigger: hand, start: 'top 75%' } })
+          .to(outline, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut', stagger: 0.05 })
+          .to(
+            dots,
+            { opacity: 1, scale: 1, duration: 0.4, stagger: 0.15, ease: 'back.out(2)' },
+            '-=0.5'
+          )
+          .to(neural, { opacity: 1, duration: 0.6 }, '-=0.3');
+      }
+
+      // Chapter 2: pinned, scrubbed 4-phase build-up
+      gsap
+        .timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: '.chapter2-section',
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 1,
+            pin: '.chapter2-pin',
+            anticipatePin: 1,
+          },
+        })
+        .fromTo('.phase-wm-1', { opacity: 0 }, { opacity: 0.05, duration: 0.5 }, 0)
+        // 1 -> 2
+        .to('.panel-1', { opacity: 0, x: -30, duration: 0.5 }, 1)
+        .to('.phase-wm-1', { opacity: 0, duration: 0.5 }, 1)
+        .fromTo('.panel-2', { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5 }, 1)
+        .fromTo('.phase-wm-2', { opacity: 0 }, { opacity: 0.05, duration: 0.5 }, 1)
+        .fromTo('.g-sensors', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1)
+        // 2 -> 3
+        .to('.panel-2', { opacity: 0, x: -30, duration: 0.5 }, 2)
+        .to('.phase-wm-2', { opacity: 0, duration: 0.5 }, 2)
+        .fromTo('.panel-3', { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5 }, 2)
+        .fromTo('.phase-wm-3', { opacity: 0 }, { opacity: 0.05, duration: 0.5 }, 2)
+        .fromTo('.g-velostat', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2)
+        // 3 -> 4
+        .to('.panel-3', { opacity: 0, x: -30, duration: 0.5 }, 3)
+        .to('.phase-wm-3', { opacity: 0, duration: 0.5 }, 3)
+        .fromTo('.panel-4', { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5 }, 3)
+        .fromTo('.phase-wm-4', { opacity: 0 }, { opacity: 0.05, duration: 0.5 }, 3)
+        .fromTo('.g-imu', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 3);
+
+      // Chapter 5 metric count-ups
+      gsap.utils.toArray<HTMLElement>('.sys-metric-value[data-value]').forEach((el) => {
+        const target = Number(el.dataset.value || '0');
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        const comma = el.dataset.comma === '1';
+        const obj = { v: 0 };
+        el.textContent = `${prefix}0${suffix}`;
+        gsap.to(obj, {
+          v: target,
+          duration: 1.8,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 88%' },
+          onUpdate: () => {
+            const n = Math.round(obj.v);
+            el.textContent = `${prefix}${comma ? n.toLocaleString('en-US') : n}${suffix}`;
+          },
+        });
+      });
+
+      // Closing CTA entrance
+      gsap.from('.research-cta-section', {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.research-cta-section', start: 'top 85%' },
+      });
+
+      ScrollTrigger.refresh();
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, [active]);
+
+  const goToChapter = (i: number) => {
+    const el = document.getElementById(i === 0 ? 'research-top' : `chapter-${i}`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const fillPct = activeChapter < 1 ? 0 : ((activeChapter - 1) / 4) * 100;
+
+  return (
+    <main ref={rootRef} className="research-page">
+      {/* ---------- Progress dots ---------- */}
+      <div className="progress-dots">
+        <span className="progress-rail" aria-hidden="true" />
+        <span className="progress-fill" style={{ height: `${fillPct}%` }} aria-hidden="true" />
+        {[1, 2, 3, 4, 5].map((i) => (
+          <button
+            key={i}
+            type="button"
+            className={cn('progress-dot', activeChapter === i && 'active')}
+            onClick={() => goToChapter(i)}
+            aria-label={t(`progress${i}`)}
+            aria-current={activeChapter === i ? 'true' : undefined}
+          >
+            <span className="progress-label">{t(`progress${i}`)}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* ---------- Hero ---------- */}
+      <section className="research-hero" id="research-top">
+        <CircuitBackground />
+        <div className="research-hero-inner">
+          <p className="research-hero-label">{t('thesis_label')}</p>
+          <h1 className="research-title text-gradient-cyan">{t('system_title')}</h1>
+          <p className="research-subtitle">{t('system_subtitle')}</p>
+          <div className="research-badges">
+            <span className="research-badge">{t('university_label')}</span>
+            <span className="research-badge">{t('year')}</span>
+          </div>
+        </div>
+        <div className="research-hero-foot">
+          <a className="btn-gold" href={RESEARCH_REPO} target="_blank" rel="noopener noreferrer">
+            <Github size={18} />
+            {t('github_label')}
+          </a>
+          <button type="button" className="research-scroll" onClick={() => goToChapter(1)}>
+            {t('scroll_begin')}
+            <ChevronDown size={16} className="research-scroll-chevron" />
+          </button>
+        </div>
+      </section>
+
+      {/* ---------- Chapter 1 ---------- */}
+      <div id="chapter-1">
+        <section className="chapter">
+          <div className="chapter-grid">
+            <div className="chapter-text">
+              <p className="chapter-label">{t('chapter1_label')}</p>
+              <h2 className="chapter-headline">{t('chapter1_title')}</h2>
+              <p className="chapter-body">{t('chapter1_body')}</p>
+            </div>
+            <div className="chapter-visual">
+              <HandDiagram />
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* ---------- Chapter 2 ---------- */}
+      <div id="chapter-2">
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter2_label')}</p>
+          <h2 className="chapter-headline">{t('chapter2_title')}</h2>
+          <p className="chapter-body">{t('chapter2_body')}</p>
+        </section>
+        {active && <GloveStage />}
+      </div>
+
+      {/* ---------- Chapter 3 ---------- */}
+      <div id="chapter-3">
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter3_label')}</p>
+          <h2 className="chapter-headline">{t('chapter3_title')}</h2>
+          <p className="chapter-body">{t('chapter3_body')}</p>
+        </section>
+        {active && <HanoiDemo />}
+      </div>
+
+      {/* ---------- Chapter 4 ---------- */}
+      <div id="chapter-4">
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter4_label')}</p>
+          <h2 className="chapter-headline">{t('chapter4_title')}</h2>
+          <p className="chapter-body">{t('chapter4_body')}</p>
+        </section>
+
+        {active && <ArGlassesReveal />}
+
+        <div className="ar-metrics-wrap">
+          <h3 className="ar-metrics-title">{t('chapter4_metrics_title')}</h3>
+          <p className="ar-metrics-subtitle">{t('chapter4_metrics_subtitle')}</p>
+          <div className="ar-metrics">
+            <div className="ar-metric-card">
+              <Gauge className="ar-metric-icon" size={26} strokeWidth={1.75} />
+              <span className="ar-metric-text">{t('chapter4_metric1')}</span>
+            </div>
+            <div className="ar-metric-card">
+              <Zap className="ar-metric-icon" size={26} strokeWidth={1.75} />
+              <span className="ar-metric-text">{t('chapter4_metric2')}</span>
+            </div>
+            <div className="ar-metric-card">
+              <Hand className="ar-metric-icon" size={26} strokeWidth={1.75} />
+              <span className="ar-metric-text">{t('chapter4_metric3')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ---------- Chapter 5: full system + finale ---------- */}
+      <div id="chapter-5">
+        <section className="chapter chapter--intro">
+          <p className="chapter-label">{t('chapter5_label')}</p>
+          <h2 className="chapter-headline">{t('chapter5_title')}</h2>
+          <p className="chapter-body">{t('chapter5_body')}</p>
+        </section>
+
+        {active && <SystemDiagram />}
+
+        <div className="sys-metrics-wrap">
+          <div className="sys-metrics">
+            {SYS_METRICS.map((m) => {
+              const Icon = m.Icon;
+              return (
+                <div className="sys-metric-card" key={m.labelKey}>
+                  <Icon className="sys-metric-icon" size={26} strokeWidth={1.75} />
+                  <span
+                    className="sys-metric-value"
+                    data-value={m.value}
+                    data-prefix={m.prefix}
+                    data-suffix={m.suffix}
+                    data-comma={m.comma ? '1' : undefined}
+                  >
+                    {m.display}
+                  </span>
+                  <span className="sys-metric-label">{t(m.labelKey)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="research-cta-section">
+          <h3>{t('chapter5_cta_title')}</h3>
+          <p>{t('chapter5_cta_subtitle')}</p>
+          <a
+            className="cta-button-primary"
+            href={RESEARCH_REPO}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Github size={18} />
+            {t('github_label')} →
+          </a>
+        </div>
+      </div>
+    </main>
+  );
+}
