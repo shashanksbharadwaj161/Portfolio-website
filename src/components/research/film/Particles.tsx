@@ -3,48 +3,37 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { filmStore } from './filmStore';
-import { particleMorph, particleFade, smoothstep, lerp } from './scenes';
+import { particleFade } from './scenes';
 
-// Dust starts cyan, shifts to the teal of the conductive thread as it prints.
-const DUST_COLOR = new THREE.Color(0x00d9ff);
-const THREAD_COLOR = new THREE.Color(0x00e5cc);
+const COUNT = 1400;
 
-// A single particle buffer that reconfigures: a dust cloud in the cold open,
-// then travels onto the sampled glove surface to "print" it in Scene 1, then
-// dissolves as the solid glove takes over.
-export default function Particles({ targets }: { targets: Float32Array }) {
-  const count = targets.length / 3;
+// Scene 0 cold-open dust: a slowly drifting cyan constellation that fades out
+// completely as Scene 1 begins (the glove then dissolves in separately).
+export default function Particles() {
   const pointsRef = useRef<THREE.Points>(null);
 
-  const { dust, geometry, material } = useMemo(() => {
-    const dust = new Float32Array(count * 3);
-    const live = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
+  const { geometry, material } = useMemo(() => {
+    const pos = new Float32Array(COUNT * 3);
+    for (let i = 0; i < COUNT; i++) {
       const r = 2 + Math.random() * 4.5;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
-      dust[i * 3] = x;
-      dust[i * 3 + 1] = y;
-      dust[i * 3 + 2] = z;
-      live[i * 3] = x;
-      live[i * 3 + 1] = y;
-      live[i * 3 + 2] = z;
+      pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      pos[i * 3 + 2] = r * Math.cos(phi);
     }
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(live, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     const material = new THREE.PointsMaterial({
       color: 0x00d9ff,
-      size: 0.035,
+      size: 0.04,
       transparent: true,
       opacity: 0.85,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
-    return { dust, geometry, material };
-  }, [count]);
+    return { geometry, material };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -53,26 +42,14 @@ export default function Particles({ targets }: { targets: Float32Array }) {
     };
   }, [geometry, material]);
 
-  useFrame((state) => {
-    const p = filmStore.progress;
-    const morph = particleMorph(p);
-    const fade = particleFade(p);
-    const t = state.clock.elapsedTime;
-    const arr = geometry.attributes.position.array as Float32Array;
-
-    for (let i = 0; i < count; i++) {
-      const ix = i * 3;
-      // gentle drift while still dust
-      const drift = (1 - morph) * 0.04;
-      const wob = Math.sin(t * 0.6 + i) * drift;
-      arr[ix] = lerp(dust[ix] + wob, targets[ix], morph);
-      arr[ix + 1] = lerp(dust[ix + 1] + Math.cos(t * 0.5 + i) * drift, targets[ix + 1], morph);
-      arr[ix + 2] = lerp(dust[ix + 2] + wob, targets[ix + 2], morph);
+  useFrame((state, delta) => {
+    const fade = particleFade(filmStore.progress);
+    material.opacity = 0.85 * fade;
+    if (pointsRef.current) {
+      pointsRef.current.visible = fade > 0.001;
+      pointsRef.current.rotation.y += delta * 0.02;
+      pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
     }
-    geometry.attributes.position.needsUpdate = true;
-    material.opacity = 0.2 + 0.65 * fade;
-    // Deterministic cyan → teal shift as the dust becomes thread.
-    material.color.copy(DUST_COLOR).lerp(THREAD_COLOR, smoothstep(0.45, 0.75, morph));
   });
 
   return <points ref={pointsRef} geometry={geometry} material={material} />;

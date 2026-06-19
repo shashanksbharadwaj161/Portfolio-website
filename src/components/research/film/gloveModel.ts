@@ -1,314 +1,292 @@
 import * as THREE from 'three';
 
-// Placement of the glove in the scene (right-of-centre so the Scene 1 text has
-// room on the left). Exported so the particle morph target can be transformed
-// to match — the samples are generated in unscaled local space.
-export const GLOVE_SCALE = 0.62;
-export const GLOVE_OFFSET: [number, number, number] = [0.5, 0.1, 0];
-
 // ============================================================
-// The actual research glove: WHITE cotton fabric, TEAL conductive thread
-// stitched in a grid, small teal sensor dots at intersections, BLACK wrist
-// strap + a dark-green PCB (IMU) module at the wrist.
+// The research glove, rebuilt as a single front-facing silhouette (like the
+// glove laid flat and shot head-on). One extruded THREE.Shape = the whole body
+// (palm + 5 fingers + thumb), so nothing can detach. The teal conductive grid
+// is DRAWN as a canvas texture on a plane sharing the exact same outline, so it
+// can never drift. Only the glowing sensor dots are real 3D meshes.
 // ============================================================
 
-// ── MATERIALS ────────────────────────────────────────────────────────────────
-function makeWhiteFabric() {
-  // Slightly grey-green off-white (not pure white) so it never reads as a blob.
-  return new THREE.MeshStandardMaterial({ color: 0xdde8e4, metalness: 0.0, roughness: 0.78, transparent: true, opacity: 0 });
+export const GLOVE_SCALE = 1.1;
+export const GLOVE_OFFSET: [number, number, number] = [1.1, 0.15, 0];
+export const GLOVE_TILT: [number, number, number] = [0, 0.15, -0.08];
+
+// Silhouette bounding box (shape space) — shared by the extrude, the texture
+// plane and the canvas, so everything lines up by construction.
+const MIN_X = -1.85;
+const MAX_X = 1.1;
+const MIN_Y = -2.6;
+const MAX_Y = 2.4;
+const BBOX_W = MAX_X - MIN_X;
+const BBOX_H = MAX_Y - MIN_Y;
+const CENTER_X = (MIN_X + MAX_X) / 2;
+const CENTER_Y = (MIN_Y + MAX_Y) / 2;
+const PLANE_Z = 0.3;
+const SENSOR_Z = 0.36;
+
+interface Pen {
+  moveTo(x: number, y: number): unknown;
+  lineTo(x: number, y: number): unknown;
+  quadraticCurveTo(cx: number, cy: number, x: number, y: number): unknown;
 }
-function makeTealThread() {
-  return new THREE.MeshStandardMaterial({
-    color: 0x1abc9c,
-    emissive: new THREE.Color(0x0d7a63),
-    emissiveIntensity: 0.4,
-    metalness: 0.3,
-    roughness: 0.5,
+
+// One continuous outline: wrist → up left palm → thumb → index → middle →
+// ring → pinky → down right palm → wrist. Rounded tips + notches via quads.
+function traceGlove(p: Pen) {
+  p.moveTo(-0.9, -2.4);
+  p.lineTo(-0.95, -0.3); // up left palm edge to thumb base
+  // thumb (angled out-left)
+  p.quadraticCurveTo(-1.75, 0.0, -1.55, 0.65);
+  p.quadraticCurveTo(-1.45, 0.95, -1.2, 0.7);
+  p.quadraticCurveTo(-0.95, 0.35, -0.82, -0.05);
+  // webbing up to index base
+  p.quadraticCurveTo(-0.95, 0.3, -0.93, 0.55);
+  // index
+  p.lineTo(-0.93, 1.75);
+  p.quadraticCurveTo(-0.93, 1.97, -0.75, 1.97);
+  p.quadraticCurveTo(-0.57, 1.97, -0.57, 1.75);
+  p.lineTo(-0.57, 0.72);
+  p.quadraticCurveTo(-0.48, 0.56, -0.39, 0.72); // index→middle notch
+  // middle (tallest)
+  p.lineTo(-0.39, 1.95);
+  p.quadraticCurveTo(-0.39, 2.2, -0.2, 2.2);
+  p.quadraticCurveTo(-0.01, 2.2, -0.01, 1.95);
+  p.lineTo(-0.01, 0.75);
+  p.quadraticCurveTo(0.08, 0.58, 0.17, 0.75); // middle→ring notch
+  // ring
+  p.lineTo(0.17, 1.8);
+  p.quadraticCurveTo(0.17, 2.05, 0.35, 2.05);
+  p.quadraticCurveTo(0.53, 2.05, 0.53, 1.8);
+  p.lineTo(0.53, 0.72);
+  p.quadraticCurveTo(0.61, 0.56, 0.69, 0.72); // ring→pinky notch
+  // pinky (shortest)
+  p.lineTo(0.69, 1.4);
+  p.quadraticCurveTo(0.69, 1.62, 0.83, 1.62);
+  p.quadraticCurveTo(0.97, 1.62, 0.97, 1.4);
+  p.lineTo(0.95, 0.3);
+  // down right palm edge to wrist
+  p.lineTo(0.9, -2.4);
+  p.lineTo(-0.9, -2.4);
+}
+
+// Conductive thread grid (shape-space line segments).
+const GRID_V: [number, number, number, number][] = [
+  // palm verticals
+  [-0.6, -2.2, -0.6, 0.4], [-0.3, -2.2, -0.3, 0.5], [0.0, -2.2, 0.0, 0.6], [0.3, -2.2, 0.3, 0.5], [0.6, -2.2, 0.6, 0.4],
+  // index
+  [-0.86, 0.5, -0.86, 1.8], [-0.75, 0.5, -0.75, 1.85], [-0.64, 0.5, -0.64, 1.8],
+  // middle
+  [-0.34, 0.6, -0.34, 2.05], [-0.2, 0.6, -0.2, 2.1], [-0.06, 0.6, -0.06, 2.05],
+  // ring
+  [0.22, 0.6, 0.22, 1.9], [0.35, 0.6, 0.35, 1.95], [0.48, 0.6, 0.48, 1.9],
+  // pinky
+  [0.73, 0.45, 0.73, 1.45], [0.83, 0.45, 0.83, 1.5], [0.93, 0.45, 0.93, 1.45],
+  // thumb
+  [-0.9, -0.1, -1.45, 0.65], [-0.8, -0.25, -1.3, 0.5],
+];
+const GRID_H: [number, number, number, number][] = [
+  // palm horizontals
+  [-0.8, -2.0, 0.8, -2.0], [-0.82, -1.6, 0.82, -1.6], [-0.85, -1.2, 0.85, -1.2], [-0.82, -0.8, 0.82, -0.8], [-0.8, -0.4, 0.8, -0.4], [-0.75, 0.0, 0.75, 0.0],
+  // index
+  [-0.9, 0.9, -0.6, 0.9], [-0.9, 1.3, -0.6, 1.3], [-0.9, 1.65, -0.6, 1.65],
+  // middle
+  [-0.36, 1.1, -0.04, 1.1], [-0.36, 1.5, -0.04, 1.5], [-0.36, 1.9, -0.04, 1.9],
+  // ring
+  [0.2, 1.05, 0.5, 1.05], [0.2, 1.45, 0.5, 1.45], [0.2, 1.8, 0.5, 1.8],
+  // pinky
+  [0.71, 0.8, 0.95, 0.8], [0.71, 1.1, 0.95, 1.1], [0.71, 1.35, 0.95, 1.35],
+];
+
+type SensorKind = 'tip' | 'palm';
+const SENSOR_POINTS: { x: number; y: number; kind: SensorKind }[] = [
+  { x: -0.75, y: 1.78, kind: 'tip' },
+  { x: -0.2, y: 2.0, kind: 'tip' },
+  { x: 0.35, y: 1.88, kind: 'tip' },
+  { x: 0.83, y: 1.43, kind: 'tip' },
+  { x: -1.4, y: 0.68, kind: 'tip' },
+  { x: -0.5, y: -0.25, kind: 'palm' },
+  { x: 0.0, y: -0.05, kind: 'palm' },
+  { x: 0.5, y: -0.25, kind: 'palm' },
+  { x: -0.4, y: -0.95, kind: 'palm' },
+  { x: 0.3, y: -0.95, kind: 'palm' },
+  { x: 0.0, y: -1.5, kind: 'palm' },
+];
+
+const TIP_COLOR = 0x00e5cc;
+const PALM_COLOR = 0x14b89a;
+const IMU_COLOR = 0x7c3aed;
+
+function makeGridTexture(): THREE.CanvasTexture {
+  const H = 1024;
+  const W = Math.round((1024 * BBOX_W) / BBOX_H);
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+  const px = (x: number) => ((x - MIN_X) / BBOX_W) * W;
+  const py = (y: number) => H - ((y - MIN_Y) / BBOX_H) * H;
+
+  // Silhouette path (transformed into pixel space).
+  const pen: Pen = {
+    moveTo: (x, y) => ctx.moveTo(px(x), py(y)),
+    lineTo: (x, y) => ctx.lineTo(px(x), py(y)),
+    quadraticCurveTo: (cx, cy, x, y) => ctx.quadraticCurveTo(px(cx), py(cy), px(x), py(y)),
+  };
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.beginPath();
+  traceGlove(pen);
+  ctx.closePath();
+  ctx.fillStyle = '#e8ede9';
+  ctx.fill();
+
+  // Clip to the silhouette so threads/dots never bleed outside the fabric.
+  ctx.save();
+  ctx.clip();
+
+  ctx.strokeStyle = 'rgba(26,188,156,0.85)';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  [...GRID_V, ...GRID_H].forEach(([x1, y1, x2, y2]) => {
+    ctx.beginPath();
+    ctx.moveTo(px(x1), py(y1));
+    ctx.lineTo(px(x2), py(y2));
+    ctx.stroke();
+  });
+
+  // Faint sensor marks baked into the texture (3D spheres glow on top).
+  SENSOR_POINTS.forEach(({ x, y, kind }) => {
+    ctx.beginPath();
+    ctx.arc(px(x), py(y), kind === 'tip' ? 7 : 6, 0, Math.PI * 2);
+    ctx.fillStyle = kind === 'tip' ? 'rgba(0,229,204,0.9)' : 'rgba(20,184,154,0.85)';
+    ctx.fill();
+  });
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+export interface GloveModel {
+  group: THREE.Group;
+  /** All fabric / hardware materials — faded in together on reveal. */
+  bodyMats: THREE.Material[];
+  /** Glowing sensor dots — faded + sequenced emissive ignition. */
+  sensors: { mesh: THREE.Mesh; phase: number }[];
+}
+
+export function buildGlove(): GloveModel {
+  const group = new THREE.Group();
+  const sensors: GloveModel['sensors'] = [];
+
+  // ── Extruded white body (one continuous silhouette) ──
+  const shape = new THREE.Shape();
+  traceGlove(shape);
+  shape.closePath();
+  const bodyGeo = new THREE.ExtrudeGeometry(shape, {
+    depth: 0.25,
+    bevelEnabled: true,
+    bevelThickness: 0.04,
+    bevelSize: 0.04,
+    bevelSegments: 4,
+  });
+  const fabricMat = new THREE.MeshStandardMaterial({ color: 0xe8ede9, roughness: 0.8, metalness: 0, transparent: true, opacity: 0 });
+  const body = new THREE.Mesh(bodyGeo, fabricMat);
+  body.renderOrder = 1;
+  group.add(body);
+
+  // ── Texture plane (grid + dots) directly in front, same outline ──
+  const gridTex = makeGridTexture();
+  const planeMat = new THREE.MeshStandardMaterial({
+    map: gridTex,
+    roughness: 0.85,
+    metalness: 0,
     transparent: true,
     opacity: 0,
+    depthWrite: false,
   });
-}
-function makeSensorNode() {
-  return new THREE.MeshStandardMaterial({
-    color: 0x00e5cc,
-    emissive: new THREE.Color(0x00c4ae),
-    emissiveIntensity: 0,
-    metalness: 0.1,
-    roughness: 0.2,
-    transparent: true,
-    opacity: 0,
-  });
-}
-function makeBlackNeoprene() {
-  return new THREE.MeshStandardMaterial({ color: 0x0d0d0d, metalness: 0.1, roughness: 0.9, transparent: true, opacity: 0 });
-}
-function makePCB() {
-  return new THREE.MeshStandardMaterial({
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(BBOX_W, BBOX_H), planeMat);
+  plane.position.set(CENTER_X, CENTER_Y, PLANE_Z);
+  plane.renderOrder = 2;
+  group.add(plane);
+
+  // ── Wrist band + buckle + PCB module ──
+  // Band overlaps the cuff bottom (palm bottom is y=-2.4) so it never floats.
+  const bandMat = new THREE.MeshStandardMaterial({ color: 0x0d0d0d, roughness: 0.9, metalness: 0.1, transparent: true, opacity: 0 });
+  const band = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.6, 0.5), bandMat);
+  band.position.set(-0.05, -2.5, 0.0); // spans y -2.2 .. -2.8, overlapping the cuff
+  group.add(band);
+
+  const buckleMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.35, metalness: 0.7, transparent: true, opacity: 0 });
+  const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.1), buckleMat);
+  buckle.position.set(-0.05, -2.55, 0.3);
+  group.add(buckle);
+
+  const pcbMat = new THREE.MeshStandardMaterial({
     color: 0x0a2010,
-    metalness: 0.4,
     roughness: 0.4,
+    metalness: 0.4,
     emissive: new THREE.Color(0x001a08),
     emissiveIntensity: 0.3,
     transparent: true,
     opacity: 0,
   });
-}
+  const pcb = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.26, 0.12), pcbMat);
+  pcb.position.set(0.15, -2.25, 0.34); // on the cuff front, just above the strap
+  group.add(pcb);
+  const chipMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3, metalness: 0.6, transparent: true, opacity: 0 });
+  ([[0.05, 0], [-0.08, 0.05]] as [number, number][]).forEach(([dx, dy]) => {
+    const chip = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.04), chipMat);
+    chip.position.set(0.15 + dx, -2.25 + dy, 0.42);
+    group.add(chip);
+  });
 
-// ── GEOMETRY HELPERS ─────────────────────────────────────────────────────────
-function fingerSeg(rTop: number, rBot: number, len: number, mat: THREE.Material): THREE.Mesh {
-  return new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, len, 14, 1), mat);
-}
+  const bodyMats: THREE.Material[] = [fabricMat, planeMat, bandMat, buckleMat, pcbMat, chipMat];
 
-// Thin tube between two points — the conductive thread lines.
-function makeTube(p1: THREE.Vector3, p2: THREE.Vector3, radius: number, mat: THREE.Material): THREE.Mesh {
-  const dir = new THREE.Vector3().subVectors(p2, p1);
-  const len = dir.length();
-  const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, 6, 1), mat);
-  mesh.position.copy(mid);
-  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-  return mesh;
-}
-
-// ── RETURN SHAPE (matches the film driver in FilmContent) ─────────────────────
-export interface GloveModel {
-  group: THREE.Group;
-  /** White fabric / strap / PCB / hardware materials — faded in on reveal. */
-  bodyMats: THREE.Material[];
-  /** Shared teal thread material — faded + glow-pulsed. */
-  threadMat: THREE.MeshStandardMaterial;
-  /** Teal sensor dots — opacity + sequenced emissive ignition. */
-  sensors: { mesh: THREE.Mesh; phase: number }[];
-  /** Point cloud roughly filling the glove — the particle morph target. */
-  samples: Float32Array;
-}
-
-const FINGER_DEFS: [number, number, number, number][] = [
-  [-0.72, 0.72, 0.16, 1.0], // index
-  [-0.22, 0.82, 0.05, 1.1], // middle (longest)
-  [0.28, 0.76, -0.05, 1.05], // ring
-  [0.76, 0.6, -0.18, 0.88], // pinky
-];
-
-export function buildGlove(): GloveModel {
-  const group = new THREE.Group();
-
-  const fabric = makeWhiteFabric();
-  const thread = makeTealThread();
-  const sensorBase = makeSensorNode();
-  const strap = makeBlackNeoprene();
-  const pcb = makePCB();
-  const buckleMat = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.7, roughness: 0.3, transparent: true, opacity: 0 });
-  const chipMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.6, roughness: 0.3, transparent: true, opacity: 0 });
-
-  const bodyMats: THREE.Material[] = [fabric, strap, pcb, buckleMat, chipMat];
-  const sensors: GloveModel['sensors'] = [];
-  const THREAD_R = 0.012;
-
+  // ── Sensor dots (real 3D glow meshes, aligned to the texture dots) ──
   const addSensor = (mesh: THREE.Mesh) => {
     sensors.push({ mesh, phase: Math.random() * Math.PI * 2 });
     group.add(mesh);
   };
-
-  // ── PALM ──
-  const palm = new THREE.Mesh(new THREE.BoxGeometry(1.9, 2.1, 0.45), fabric);
-  palm.position.set(0, -0.25, 0);
-  group.add(palm);
-  [-0.95, 0.95].forEach((x) => {
-    const edge = new THREE.Mesh(new THREE.CylinderGeometry(0.225, 0.225, 2.1, 10), fabric);
-    edge.position.set(x, -0.25, 0);
-    group.add(edge);
-  });
-
-  // ── WRIST + BLACK STRAP + PCB MODULE ──
-  const wrist = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.92, 0.7, 16), fabric);
-  wrist.position.set(0, -1.5, 0);
-  group.add(wrist);
-
-  const strapMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.96, 0.96, 0.5, 20), strap);
-  strapMesh.position.set(0, -1.85, 0);
-  group.add(strapMesh);
-
-  const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.08), buckleMat);
-  buckle.position.set(0, -1.85, 0.98);
-  group.add(buckle);
-
-  const pcbMesh = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.12), pcb);
-  pcbMesh.position.set(0.2, -1.78, 0.88);
-  group.add(pcbMesh);
-  ([[0, 0], [0.12, -0.06], [-0.1, 0.05]] as [number, number][]).forEach(([dx, dy]) => {
-    const chip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.04), chipMat);
-    chip.position.set(0.2 + dx, -1.78 + dy, 0.95);
-    group.add(chip);
-  });
-
-  // ── FINGERS ──
-  const fingertips: THREE.Vector3[] = [];
-  const midJoints: THREE.Vector3[] = [];
-
-  FINGER_DEFS.forEach(([x, yBase, rz, scale]) => {
-    const fg = new THREE.Group();
-    fg.position.set(x, yBase, 0);
-    fg.rotation.z = rz;
-
-    const segLengths = [0.55, 0.48, 0.4].map((l) => l * scale);
-    const segRadii = [
-      [0.158, 0.148],
-      [0.148, 0.138],
-      [0.138, 0.118],
-    ].map((r) => r.map((v) => v * scale));
-
-    let yOff = 0;
-    segLengths.forEach((len, si) => {
-      const seg = fingerSeg(segRadii[si][0], segRadii[si][1], len, fabric);
-      seg.position.y = yOff + len / 2;
-      fg.add(seg);
-
-      const crease = new THREE.Mesh(new THREE.TorusGeometry(segRadii[si][0] * 1.02, 0.012, 6, 18), fabric);
-      crease.position.y = yOff + len;
-      crease.rotation.x = Math.PI / 2;
-      fg.add(crease);
-
-      if (si === 1) midJoints.push(new THREE.Vector3(x, yBase + yOff + len, 0.16));
-      yOff += len + 0.015;
+  SENSOR_POINTS.forEach(({ x, y, kind }) => {
+    const col = kind === 'tip' ? TIP_COLOR : PALM_COLOR;
+    const mat = new THREE.MeshStandardMaterial({
+      color: col,
+      emissive: new THREE.Color(col),
+      emissiveIntensity: 0,
+      roughness: 0.2,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0,
     });
-
-    const tip = new THREE.Mesh(
-      new THREE.SphereGeometry(segRadii[2][0], 10, 8, 0, Math.PI * 2, 0, Math.PI / 2),
-      fabric
-    );
-    tip.position.y = yOff;
-    tip.rotation.x = Math.PI;
-    fg.add(tip);
-
-    fingertips.push(new THREE.Vector3(x, yBase + yOff + 0.05, 0.05));
-    group.add(fg);
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(kind === 'tip' ? 0.07 : 0.06, 12, 10), mat);
+    mesh.position.set(x, y, SENSOR_Z);
+    mesh.renderOrder = 3;
+    addSensor(mesh);
   });
+  // IMU sensor on the PCB.
+  const imuMat = new THREE.MeshStandardMaterial({
+    color: IMU_COLOR,
+    emissive: new THREE.Color(IMU_COLOR),
+    emissiveIntensity: 0,
+    roughness: 0.2,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0,
+  });
+  const imu = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), imuMat);
+  imu.position.set(0.15, -2.25, 0.46);
+  imu.renderOrder = 3;
+  addSensor(imu);
 
-  // ── THUMB ──
-  const thumbGrp = new THREE.Group();
-  thumbGrp.position.set(-1.12, -0.05, 0.08);
-  thumbGrp.rotation.set(-0.05, -0.25, 0.85);
-  ([
-    [0.19, 0.175, 0.58],
-    [0.175, 0.158, 0.48],
-    [0.158, 0.135, 0.4],
-  ] as [number, number, number][]).forEach(([r1, r2, l], si) => {
-    const seg = fingerSeg(r1, r2, l, fabric);
-    seg.position.y = si * 0.52 + l / 2;
-    thumbGrp.add(seg);
-    if (si < 2) {
-      const crease = new THREE.Mesh(new THREE.TorusGeometry(r1 * 1.02, 0.012, 6, 18), fabric);
-      crease.position.y = si * 0.52 + l;
-      crease.rotation.x = Math.PI / 2;
-      thumbGrp.add(crease);
-    }
-  });
-  group.add(thumbGrp);
-  fingertips.push(new THREE.Vector3(-1.55, 0.9, 0.1));
-
-  // ── CONDUCTIVE THREAD GRID (the key visual) ──
-  // Vertical lines up palm + each finger.
-  FINGER_DEFS.forEach(([x, yBase, , scale], fi) => {
-    const baseY = -1.2;
-    const tipY = yBase + [1.5, 1.65, 1.58, 1.32][fi] * scale;
-    [-0.06, 0.0, 0.06].forEach((dx) => {
-      group.add(makeTube(new THREE.Vector3(x + dx, baseY, 0.23), new THREE.Vector3(x + dx * 0.3, tipY, 0.15), THREAD_R, thread));
-    });
-  });
-  // Horizontal palm rows.
-  for (let yi = 0; yi < 7; yi++) {
-    const y = -1.1 + yi * 0.28;
-    group.add(makeTube(new THREE.Vector3(-1.0, y, 0.23), new THREE.Vector3(1.0, y, 0.23), THREAD_R, thread));
-  }
-  // Horizontal finger rows.
-  FINGER_DEFS.forEach(([x, yBase, rz, scale]) => {
-    for (let row = 0; row < 3; row++) {
-      const y = yBase + 0.35 + row * 0.48 * scale;
-      const hw = 0.14 * scale;
-      group.add(
-        makeTube(
-          new THREE.Vector3(x - hw * Math.cos(rz), y, 0.15),
-          new THREE.Vector3(x + hw * Math.cos(rz), y, 0.15),
-          THREAD_R * 0.9,
-          thread
-        )
-      );
-    }
-  });
-  // Thumb threads.
-  for (let i = 0; i < 3; i++) {
-    group.add(
-      makeTube(
-        new THREE.Vector3(-1.25, -0.1 + i * 0.45, 0.2),
-        new THREE.Vector3(-1.45, 0.1 + i * 0.45, 0.15),
-        THREAD_R * 0.85,
-        thread
-      )
-    );
-  }
-
-  // ── SENSOR NODES (teal dots at intersections) ──
-  fingertips.forEach((pos) => {
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), sensorBase.clone());
-    s.position.copy(pos);
-    addSensor(s);
-  });
-  midJoints.forEach((pos) => {
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 6), sensorBase.clone());
-    s.position.copy(pos);
-    addSensor(s);
-  });
-  ([
-    [-0.55, 0.05, 0.24],
-    [0.0, 0.15, 0.24],
-    [0.5, 0.05, 0.24],
-    [-0.45, -0.4, 0.24],
-    [0.0, -0.3, 0.24],
-    [0.45, -0.4, 0.24],
-    [-0.5, -0.8, 0.24],
-    [0.5, -0.8, 0.24],
-  ] as [number, number, number][]).forEach(([x, y, z]) => {
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.042, 8, 6), sensorBase.clone());
-    s.position.set(x, y, z);
-    addSensor(s);
-  });
-  sensorBase.dispose(); // only its clones are used
-
-  // ── SURFACE POINT CLOUD (particle morph target) ──
-  const COUNT = 2800;
-  const samples = new Float32Array(COUNT * 3);
-  for (let i = 0; i < COUNT; i++) {
-    const r = Math.random();
-    let x: number;
-    let y: number;
-    let z: number;
-    if (r < 0.4) {
-      x = (Math.random() - 0.5) * 1.8;
-      y = -1.1 + Math.random() * 1.7;
-      z = (Math.random() - 0.5) * 0.45;
-    } else if (r < 0.8) {
-      const fi = Math.floor(Math.random() * 4);
-      const [fx, fyBase] = FINGER_DEFS[fi];
-      x = fx + (Math.random() - 0.5) * 0.32;
-      y = fyBase + Math.random() * 1.5;
-      z = (Math.random() - 0.5) * 0.3;
-    } else {
-      x = -1.12 + (Math.random() - 0.5) * 0.38;
-      y = -0.05 + Math.random() * 1.1;
-      z = 0.08 + (Math.random() - 0.5) * 0.3;
-    }
-    samples[i * 3] = x;
-    samples[i * 3 + 1] = y;
-    samples[i * 3 + 2] = z;
-  }
-
-  // Scale down + shift right (FilmContent applies the same transform to the
-  // particle target and the camera looks slightly left of it).
   group.scale.setScalar(GLOVE_SCALE);
   group.position.set(GLOVE_OFFSET[0], GLOVE_OFFSET[1], GLOVE_OFFSET[2]);
+  group.rotation.set(GLOVE_TILT[0], GLOVE_TILT[1], GLOVE_TILT[2]);
 
-  return { group, bodyMats, threadMat: thread, sensors, samples };
+  return { group, bodyMats, sensors };
 }
 
 export function disposeGlove(group: THREE.Group) {
@@ -316,6 +294,12 @@ export function disposeGlove(group: THREE.Group) {
     const mesh = o as THREE.Mesh;
     if (mesh.geometry) mesh.geometry.dispose();
     const mat = mesh.material;
-    if (mat) (Array.isArray(mat) ? mat : [mat]).forEach((m) => m.dispose());
+    if (mat) {
+      (Array.isArray(mat) ? mat : [mat]).forEach((m) => {
+        const map = (m as THREE.MeshStandardMaterial).map;
+        if (map) map.dispose();
+        m.dispose();
+      });
+    }
   });
 }

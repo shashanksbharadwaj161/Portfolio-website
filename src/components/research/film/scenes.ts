@@ -50,12 +50,12 @@ interface CamKey {
 // Targets sit slightly left of the glove (~x 0.4–0.5) so it lands right-of-centre
 // with the Scene 1 text on the left.
 const CAM_KEYS: CamKey[] = [
-  { p: 0.0, pos: [0, 0, 14], tgt: [0, 0, 0] }, // cold open — far back
-  { p: 0.06, pos: [0, 0, 11], tgt: [0, 0, 0] }, // drift in
-  { p: 0.12, pos: [0.4, 0.5, 9.5], tgt: [0.1, 0.1, 0] }, // ease toward glove
-  { p: 0.22, pos: [2.0, 0.3, 8.6], tgt: [0.1, 0.15, 0] }, // gentle orbit right
-  { p: 0.32, pos: [0.6, 0.1, 8.0], tgt: [-0.1, 0.1, 0] }, // settle, glove right-of-centre
-  { p: 1.0, pos: [0.6, 0.1, 8.0], tgt: [-0.1, 0.1, 0] }, // hold
+  { p: 0.0, pos: [0, 0, 17], tgt: [0, 0, 0] }, // cold open — far back
+  { p: 0.06, pos: [0, 0, 14], tgt: [0, 0, 0] }, // drift in
+  { p: 0.12, pos: [0.8, 0.5, 12.5], tgt: [0.4, 0.1, 0] }, // ease toward glove
+  { p: 0.22, pos: [2.6, 0.4, 12], tgt: [0.4, 0.1, 0] }, // gentle orbit right
+  { p: 0.32, pos: [0.7, 0.1, 11], tgt: [0.25, 0.0, 0] }, // settle, full glove right-of-centre
+  { p: 1.0, pos: [0.7, 0.1, 11], tgt: [0.25, 0.0, 0] }, // hold
 ];
 
 /** Camera position + look target as a pure function of global progress. */
@@ -77,15 +77,13 @@ export function getCamera(p: number): CamState {
   };
 }
 
-/** 0 → 1 as the solid glove fades in across Scene 1. */
-export const gloveReveal = (p: number) => smoothstep(0.3, 0.62, p);
+/** 0 → 1 as the glove dissolves in across Scene 1 (after the dust clears). */
+export const gloveReveal = (p: number) => smoothstep(0.26, 0.55, p);
 /** 0 → 1 as the teal sensor dots ignite (after the glove has formed). */
 export const sensorIgnite = (p: number) => smoothstep(0.55, 0.85, p);
-/** 0 → 1 as dust particles travel from the cloud onto the glove surface. */
-export const particleMorph = (p: number) => smoothstep(0.28, 0.55, p);
-/** 1 → 0 as particles dissolve once the solid glove has taken over. */
-export const particleFade = (p: number) => 1 - smoothstep(0.58, 0.85, p);
-/** Bloom strength: dramatic cold open, very subtle once the white glove is on. */
-export const bloomStrength = (p: number) => lerp(1.6, 0.4, smoothstep(0.06, 0.16, p));
+/** 1 → 0 as the cold-open dust fades out before the glove appears. */
+export const particleFade = (p: number) => 1 - smoothstep(0.14, 0.28, p);
+/** Bloom strength: dramatic cold open, essentially off for the white glove. */
+export const bloomStrength = (p: number) => lerp(1.4, 0.15, smoothstep(0.06, 0.16, p));
 /** Scene-1 light ramp — lights come up slightly ahead of the fabric reveal. */
 export const lightUp = (p: number) => smoothstep(0.14, 0.4, p);
