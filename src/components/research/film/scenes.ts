@@ -40,32 +40,40 @@ export interface CamState {
   target: [number, number, number];
 }
 
+interface CamKey {
+  p: number;
+  pos: [number, number, number];
+  tgt: [number, number, number];
+}
+
+// Pulled-back keyframes so the full glove is framed (no cropped fingertips).
+// Targets sit slightly left of the glove (~x 0.4–0.5) so it lands right-of-centre
+// with the Scene 1 text on the left.
+const CAM_KEYS: CamKey[] = [
+  { p: 0.0, pos: [0, 0, 14], tgt: [0, 0, 0] }, // cold open — far back
+  { p: 0.06, pos: [0, 0, 11], tgt: [0, 0, 0] }, // drift in
+  { p: 0.12, pos: [0.4, 0.5, 9.5], tgt: [0.1, 0.1, 0] }, // ease toward glove
+  { p: 0.22, pos: [2.0, 0.3, 8.6], tgt: [0.1, 0.15, 0] }, // gentle orbit right
+  { p: 0.32, pos: [0.6, 0.1, 8.0], tgt: [-0.1, 0.1, 0] }, // settle, glove right-of-centre
+  { p: 1.0, pos: [0.6, 0.1, 8.0], tgt: [-0.1, 0.1, 0] }, // hold
+];
+
 /** Camera position + look target as a pure function of global progress. */
 export function getCamera(p: number): CamState {
-  // Scene 0 — drift forward through the dust.
-  const s0 = smoothstep(0, 0.34, p);
-  const cam0: CamState = {
-    pos: [0, lerp(0.7, 0.45, s0), lerp(9, 6.6, s0)],
-    target: [0, 0, 0],
-  };
-
-  // Scene 1 — slow orbit around the glove.
-  const q = localProgress(p, SCENES[1]);
-  const ang = lerp(-0.55, 0.5, q);
-  const rad = lerp(6.6, 5.3, smoothstep(0, 0.5, q));
-  const cam1: CamState = {
-    pos: [Math.sin(ang) * rad, lerp(0.45, 0.65, q), Math.cos(ang) * rad],
-    target: [0, -0.2, 0],
-  };
-
-  const w = smoothstep(0.3, 0.36, p);
+  let a = CAM_KEYS[0];
+  let b = CAM_KEYS[CAM_KEYS.length - 1];
+  for (let i = 0; i < CAM_KEYS.length - 1; i++) {
+    if (p >= CAM_KEYS[i].p && p <= CAM_KEYS[i + 1].p) {
+      a = CAM_KEYS[i];
+      b = CAM_KEYS[i + 1];
+      break;
+    }
+  }
+  if (p >= b.p) a = b;
+  const t = a === b ? 0 : smoothstep(a.p, b.p, p);
   return {
-    pos: [lerp(cam0.pos[0], cam1.pos[0], w), lerp(cam0.pos[1], cam1.pos[1], w), lerp(cam0.pos[2], cam1.pos[2], w)],
-    target: [
-      lerp(cam0.target[0], cam1.target[0], w),
-      lerp(cam0.target[1], cam1.target[1], w),
-      lerp(cam0.target[2], cam1.target[2], w),
-    ],
+    pos: [lerp(a.pos[0], b.pos[0], t), lerp(a.pos[1], b.pos[1], t), lerp(a.pos[2], b.pos[2], t)],
+    target: [lerp(a.tgt[0], b.tgt[0], t), lerp(a.tgt[1], b.tgt[1], t), lerp(a.tgt[2], b.tgt[2], t)],
   };
 }
 
@@ -77,5 +85,7 @@ export const sensorIgnite = (p: number) => smoothstep(0.55, 0.85, p);
 export const particleMorph = (p: number) => smoothstep(0.28, 0.55, p);
 /** 1 → 0 as particles dissolve once the solid glove has taken over. */
 export const particleFade = (p: number) => 1 - smoothstep(0.58, 0.85, p);
-/** Bloom strength: high in the cold open, settling for the glove reveal. */
-export const bloomStrength = (p: number) => lerp(1.15, 0.6, smoothstep(0, 0.4, p));
+/** Bloom strength: dramatic cold open, very subtle once the white glove is on. */
+export const bloomStrength = (p: number) => lerp(1.6, 0.4, smoothstep(0.06, 0.16, p));
+/** Scene-1 light ramp — lights come up slightly ahead of the fabric reveal. */
+export const lightUp = (p: number) => smoothstep(0.14, 0.4, p);

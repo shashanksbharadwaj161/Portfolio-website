@@ -30,9 +30,9 @@ export default function ResearchFilm() {
         camera={{ fov: 42, near: 0.01, far: 100, position: [0, 0.7, 9] }}
         onCreated={({ gl, scene }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.05;
-          scene.background = new THREE.Color(0x010508);
-          scene.fog = new THREE.FogExp2(0x010508, 0.055);
+          gl.toneMappingExposure = 1.0;
+          scene.background = new THREE.Color(0x020810);
+          scene.fog = new THREE.FogExp2(0x020810, 0.04);
         }}
       >
         <VisibilityPause />

@@ -1,5 +1,11 @@
 import * as THREE from 'three';
 
+// Placement of the glove in the scene (right-of-centre so the Scene 1 text has
+// room on the left). Exported so the particle morph target can be transformed
+// to match — the samples are generated in unscaled local space.
+export const GLOVE_SCALE = 0.62;
+export const GLOVE_OFFSET: [number, number, number] = [0.5, 0.1, 0];
+
 // ============================================================
 // The actual research glove: WHITE cotton fabric, TEAL conductive thread
 // stitched in a grid, small teal sensor dots at intersections, BLACK wrist
@@ -8,7 +14,8 @@ import * as THREE from 'three';
 
 // ── MATERIALS ────────────────────────────────────────────────────────────────
 function makeWhiteFabric() {
-  return new THREE.MeshStandardMaterial({ color: 0xf0f0ee, metalness: 0.0, roughness: 0.92, transparent: true, opacity: 0 });
+  // Slightly grey-green off-white (not pure white) so it never reads as a blob.
+  return new THREE.MeshStandardMaterial({ color: 0xdde8e4, metalness: 0.0, roughness: 0.78, transparent: true, opacity: 0 });
 }
 function makeTealThread() {
   return new THREE.MeshStandardMaterial({
@@ -295,6 +302,11 @@ export function buildGlove(): GloveModel {
     samples[i * 3 + 1] = y;
     samples[i * 3 + 2] = z;
   }
+
+  // Scale down + shift right (FilmContent applies the same transform to the
+  // particle target and the camera looks slightly left of it).
+  group.scale.setScalar(GLOVE_SCALE);
+  group.position.set(GLOVE_OFFSET[0], GLOVE_OFFSET[1], GLOVE_OFFSET[2]);
 
   return { group, bodyMats, threadMat: thread, sensors, samples };
 }

@@ -52,7 +52,9 @@ export default function Effects() {
   const fx = useMemo(() => {
     const composer = new EffectComposer(gl);
     composer.addPass(new RenderPass(scene, camera));
-    const bloom = new UnrealBloomPass(new THREE.Vector2(size.width, size.height), 1.1, 0.55, 0.05);
+    // strength (driven per-frame), radius (tight), threshold (high so only the
+    // emissive teal sensors/threads bloom — not the diffuse white fabric).
+    const bloom = new UnrealBloomPass(new THREE.Vector2(size.width, size.height), 1.6, 0.35, 0.7);
     composer.addPass(bloom);
     const grain = new ShaderPass(GrainShader);
     composer.addPass(grain);
