@@ -25,10 +25,28 @@ Requirements:
 - 5 distinct fingers + a cuff/wrist opening (matches the reference photo).
 - If CC-BY, keep the author credit (add it to the site footer / this file).
 
-## After adding the file
+## Current model
 
-No code changes needed — reload `/en/research` (desktop) and scroll to Chapter 1.
-The model is auto-centred and scaled to ~5 units tall, placed right-of-centre,
-with the procedural microcontroller + glowing sensor dots attached. Scale,
-orientation and sensor placement will likely need a quick tuning pass once the
-specific model is in (its native up-axis / facing may differ).
+`glove.glb` — Quaternius low-poly glove (via Poly Pizza), **CC0**, 456 tris.
+FBX2glTF export: it imports lying flat (baked −90° X + 100× scale, fingers
+along +Z), and its UVs are a single-texel palette (no usable unwrap), so the
+conductive-thread look is done with **emissive sensor dots**, not a texture.
+
+`GloveGlb.tsx` stands it up, centres it, scales to ~5 units tall, places it
+right-of-centre, overrides the material to matte off-white, and attaches a
+black wrist strap + procedural PCB module and the glowing sensor grid.
+
+## Tuning (likely needs a browser pass)
+
+Orientation is the one thing to eyeball in `GloveGlb.tsx`:
+
+- `ORIENT_X` — flip the sign if the glove appears upside-down.
+- `ORIENT_Y` — set to `Math.PI` if the palm faces away from the camera.
+
+Sensor-dot and strap placement are proportional to the bounding box, so they
+move with any scale/orientation change but may want nudging to taste.
+
+## Replacing the model
+
+Drop a different `.glb` at this path and reload. If the new model isn't
+lying-flat / Z-forward, adjust `ORIENT_X` / `ORIENT_Y` accordingly.
