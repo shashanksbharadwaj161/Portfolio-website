@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { filmStore } from './filmStore';
 import { SCENES, localProgress, clamp01, lerp, smoothstep } from './scenes';
 
@@ -55,9 +56,9 @@ const IDLE_BOB_SPEED = 0.7;
 const IDLE_PULSE_AMP = 0.18; // subtle per-dot brightness pulse
 const IDLE_PULSE_SPEED = 2.0;
 
-// Matte off-white e-textile fabric. Deliberately NOT pure white so it doesn't
-// blow out under bloom (the reference glove is cotton, not paper-white).
-const BODY_COLOR = 0xe8e4da;
+// Matte off-white e-textile fabric. Near-white cotton (not pure white, so it
+// doesn't blow out under bloom) — brighter than before so it doesn't read grey.
+const BODY_COLOR = 0xf0ece2;
 
 const TIP_COLOR = 0x1fd6bd; // bright teal fingertip / knuckle sensor nodes
 const PALM_COLOR = 0x14b89a; // slightly deeper teal palm-grid nodes
@@ -66,11 +67,39 @@ const LED_COLOR = 0x00e5cc;
 function fabricMaterial(): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
     color: BODY_COLOR,
-    roughness: 0.85,
+    roughness: 0.8,
     metalness: 0.0,
     transparent: true,
     opacity: 0,
+    flatShading: false, // rely on the smoothed (welded) vertex normals
   });
+}
+
+// Quaternius/FBX2glTF exports split vertices per-face for flat shading, so a bare
+// computeVertexNormals() can't smooth them. Weld coincident verts first (drop the
+// baked flat normals so position-equal verts merge), THEN recompute smooth normals.
+// Returns a fresh geometry so the useGLTF-cached original is never mutated.
+function smoothGeometry(src: THREE.BufferGeometry): THREE.BufferGeometry {
+  const g = src.clone();
+  g.deleteAttribute('normal');
+  g.deleteAttribute('uv'); // single-texel palette UVs would block welding
+  g.deleteAttribute('uv1');
+  const merged = mergeVertices(g);
+  merged.computeVertexNormals();
+  g.dispose();
+  return merged;
+}
+
+// Neighborhood snap: place a dot at target (tx,ty) but ON the real mesh surface —
+// the nearest vertex by XY, lifted to the frontmost (max-Z) of its 8 XY-neighbors
+// so it sits on the camera-facing skin (fingers sit back, palm bulges forward).
+function snapToSurface(verts: THREE.Vector3[], tx: number, ty: number): THREE.Vector3 {
+  const scored = verts
+    .map((v) => ({ v, d: (v.x - tx) ** 2 + (v.y - ty) ** 2 }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 8);
+  const frontZ = Math.max(...scored.map((s) => s.v.z));
+  return new THREE.Vector3(scored[0].v.x, scored[0].v.y, frontZ + 0.05);
 }
 
 // Emissive teal sensor dot — the whole "e-textile" read, since the model's UVs
@@ -188,11 +217,12 @@ export default function GloveGlb() {
     const root = new THREE.Group();
     const bodyMats: THREE.Material[] = [];
 
-    // Clone (useGLTF caches the original) + override materials for the fabric look.
+    // Clone (useGLTF caches the original) + weld/smooth geometry + override material.
     const model = scene.clone(true);
     model.traverse((child) => {
       const mesh = child as THREE.Mesh;
       if (mesh.isMesh) {
+        mesh.geometry = smoothGeometry(mesh.geometry);
         const mat = fabricMaterial();
         mesh.material = mat;
         bodyMats.push(mat);
@@ -215,23 +245,40 @@ export default function GloveGlb() {
     normalized.scale.setScalar(s);
     root.add(normalized);
 
-    // Scaled half-extents (model now centred at root origin).
-    const hx = (size.x * s) / 2;
-    const hy = (size.y * s) / 2;
-    const hz = (size.z * s) / 2;
-    const zFront = hz * 0.82; // park dots just proud of the front surface
+    // Sample the REAL mesh surface in root-local space (root is still at origin
+    // here; OFFSET is applied last and inherited equally by mesh + dots). Dots are
+    // then snapped onto these actual vertices instead of guessing AABB fractions.
+    root.updateMatrixWorld(true);
+    const surface: THREE.Vector3[] = [];
+    model.traverse((child) => {
+      const mesh = child as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const pos = mesh.geometry.getAttribute('position');
+      for (let i = 0; i < pos.count; i++) {
+        surface.push(new THREE.Vector3().fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld));
+      }
+    });
+    const sbox = new THREE.Box3().setFromPoints(surface);
+    const ssize = sbox.getSize(new THREE.Vector3());
+    const hx = ssize.x / 2;
+    const hy = ssize.y / 2;
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.info('[research-film] glove root bbox', { hx: +hx.toFixed(2), hy: +hy.toFixed(2), hz: +(ssize.z / 2).toFixed(2), verts: surface.length });
+    }
 
     // Wrist strap + microcontroller module.
     const wrist = buildWristModule(hx, hy);
     root.add(wrist.group);
     bodyMats.push(...wrist.mats);
 
-    // Sensor dots (STEP 2B): fingertips + a knuckle row + a palm grid. Read as a
-    // high-tech sensor glove; placement is proportional, not anatomical. `ord` is
-    // the ignition order: LED(0) -> knuckles(1-4) -> palm(5-10) -> fingertips(11-15).
+    // Sensor dots (STEP 2B): fingertips + a knuckle row + a palm grid. Each (tx,ty)
+    // target is SNAPPED onto the real surface, so dots sit on the glove, never in
+    // the empty AABB corners. `ord` = ignition order: LED(0) -> knuckles(1-4) ->
+    // palm(5-10) -> fingertips(11-15).
     const sensors: { mesh: THREE.Mesh; phase: number; ord: number }[] = [];
-    const addSensor = (mesh: THREE.Mesh, x: number, y: number, ord: number) => {
-      mesh.position.set(x, y, zFront);
+    const addSensor = (mesh: THREE.Mesh, tx: number, ty: number, ord: number) => {
+      mesh.position.copy(snapToSurface(surface, tx, ty));
       root.add(mesh);
       sensors.push({ mesh, phase: Math.random() * Math.PI * 2, ord });
     };
